@@ -1,6 +1,6 @@
 package com.ccs.erp.domain.desconto;
 
-import com.ccs.erp.domain.model.entity.ItemPedido;
+import com.ccs.erp.domain.entity.ItemPedido;
 
 public class DescontoItem implements Desconto {
 

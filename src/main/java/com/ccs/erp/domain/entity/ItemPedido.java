@@ -1,4 +1,4 @@
-package com.ccs.erp.domain.model.entity;
+package com.ccs.erp.domain.entity;
 
 import com.ccs.erp.infrastructure.exception.ValorItemNegativoException;
 import lombok.*;
@@ -23,7 +23,7 @@ public class ItemPedido {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "Item_id")
+    @JoinColumn(name = "item_id", referencedColumnName = "id")
     private Item item;
 
     @Column(nullable = false)

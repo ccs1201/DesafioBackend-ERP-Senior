@@ -11,6 +11,9 @@ import java.lang.reflect.ParameterizedType;
  * @param <RESPONSEMODEL> Classe que representa um RESPONSE de uma Entidade de Domínio.
  * @param <INPUTMODEL>    Classe que representa um INPUT de uma Entidade de Domínio.
  * @param <ENTITY>        Classe que representa uma ENTIDADE de Domínio.
+ * @author Cleber Souza
+ * @version 1.0
+ * @since 21/08/2022
  */
 public abstract class AbstractMapper<RESPONSEMODEL, INPUTMODEL, ENTITY> implements MapperInterface<RESPONSEMODEL, INPUTMODEL, ENTITY> {
 

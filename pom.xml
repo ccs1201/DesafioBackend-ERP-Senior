@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<org-modelmapper.version>3.0.0</org-modelmapper.version>
+		<org-springdoc.version>1.6.13</org-springdoc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -68,15 +69,27 @@
 			<artifactId>modelmapper</artifactId>
 			<version>${org-modelmapper.version}</version>
 		</dependency>
-	</dependencies>
 
+		<!-- Spring Openapi — Documentação da API -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>${org-springdoc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-webmvc-core</artifactId>
+			<version>${org-springdoc.version}</version>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${parent.version}</version>
+				<version>${project.parent.version}</version>
 				<configuration>
 					<excludes>
 						<exclude>

@@ -1,9 +1,6 @@
-package com.ccs.erp.domain.model.entity;
+package com.ccs.erp.domain.entity;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -16,6 +13,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @DynamicUpdate
 public class Item {
@@ -38,6 +37,6 @@ public class Item {
     private BigDecimal valor;
 
     @NotNull
-    @Column(nullable = false, columnDefinition = "true")
+    @Column(nullable = false)
     private Boolean ativo;
 }

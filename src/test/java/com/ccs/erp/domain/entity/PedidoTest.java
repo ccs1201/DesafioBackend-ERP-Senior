@@ -1,4 +1,4 @@
-package com.ccs.erp.domain.model.entity;
+package com.ccs.erp.domain.entity;
 
 import com.ccs.erp.domain.desconto.DescontoItem;
 import com.ccs.erp.domain.desconto.DescontoSomenteProduto;
