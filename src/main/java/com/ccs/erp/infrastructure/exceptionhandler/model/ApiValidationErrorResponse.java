@@ -1,6 +1,5 @@
 package com.ccs.erp.infrastructure.exceptionhandler.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

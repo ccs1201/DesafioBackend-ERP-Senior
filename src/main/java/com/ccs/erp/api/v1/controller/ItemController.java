@@ -22,7 +22,7 @@ import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 @RestController
-@RequestMapping("/api/v1/item")
+@RequestMapping("/api/v1/itens")
 @RequiredArgsConstructor
 public class ItemController implements ItemControllerDoc {
 

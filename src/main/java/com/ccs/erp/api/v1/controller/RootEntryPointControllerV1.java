@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.CompletableFuture;
 
-import static java.util.concurrent.CompletableFuture.*;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
@@ -28,7 +28,7 @@ public class RootEntryPointControllerV1 {
         return supplyAsync(() -> {
             var root = new RootEntryPointModelV1();
 
-            root.add(linkTo(ItemController.class).withRel("items"));
+            root.add(linkTo(ItemController.class).withRel("itens"));
 
             return root;
         });
