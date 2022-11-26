@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -13,7 +15,8 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Schema(name = "Item Response", description = "Modelo de resposta de Item")
-public class ItemResponse {
+@Relation("item")
+public class ItemResponse extends RepresentationModel<ItemResponse> {
 
     private UUID id;
 

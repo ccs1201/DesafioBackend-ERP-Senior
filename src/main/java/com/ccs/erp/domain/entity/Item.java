@@ -39,4 +39,12 @@ public class Item {
     @NotNull
     @Column(nullable = false)
     private Boolean ativo;
+
+    public void inativa() {
+        this.ativo = false;
+    }
+
+    public void ativa() {
+        this.ativo = true;
+    }
 }

@@ -69,4 +69,19 @@ public class ItemService {
 
 
     }
+
+    @Transactional
+    public void ativar(UUID id) {
+
+        var item = this.findById(id);
+        item.ativa();
+        this.save(item);
+
+    }
+
+    public void inativar(UUID id) {
+        var item = this.findById(id);
+        item.inativa();
+        this.save(item);
+    }
 }

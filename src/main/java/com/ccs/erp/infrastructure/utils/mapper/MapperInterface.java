@@ -26,7 +26,7 @@ public interface MapperInterface<RESPONSEMODEL, INPUTMODEL, ENTITY> {
      * @param entity Entidade que será transformado.
      * @return {@code RESPONSEMODEL} Um novo ResponseModel.
      */
-    RESPONSEMODEL toResponseModel(ENTITY entity);
+    RESPONSEMODEL toModel(ENTITY entity);
 
     /**
      * <p><b>Transforma um InputModel em uma Entidade</b></p>
@@ -51,7 +51,7 @@ public interface MapperInterface<RESPONSEMODEL, INPUTMODEL, ENTITY> {
      * @return {@link Page<RESPONSEMODEL>}
      */
     default Page<RESPONSEMODEL> toPage(Page<ENTITY> page) {
-        return page.map(this::toResponseModel);
+        return page.map(this::toModel);
     }
 
     /**
@@ -75,7 +75,7 @@ public interface MapperInterface<RESPONSEMODEL, INPUTMODEL, ENTITY> {
      */
     default Collection<RESPONSEMODEL> toCollection(Collection<ENTITY> collection) {
         return collection.stream()
-                .map(this::toResponseModel)
+                .map(this::toModel)
                 .collect(Collectors.toList());
     }
 }
