@@ -9,15 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Schema(name = "Item ID Input", description = "Representação do ID de item utilizado em associações como em Item Pedido",
-example = """
-        {
-        itemPedido :\s
-        [\s
-        itemIdInput: xyz
-        itemIdInput: abc
-        ]
-        }""")
+@Schema(name = "Item ID Input", description = "Representação do ID de item utilizado em associações como em Item Pedido")
 public class ItemIdInput {
 
     @NotNull

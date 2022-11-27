@@ -49,13 +49,15 @@ public interface Desconto {
     }
 
     /**
-     * <p>Calcula o valor do desconto para o item</p>
+     * <p>Calcula o valor do desconto para o item e seta
+     * em {@code itemPedido.valorDesconto}</p>
      * <br>
+     *
      * @param percentualDesconto O desconto que será aplicado (percentual)
-     * @param itemPedido O item em que será aplicado o desconto.
+     * @param itemPedido         O item em que será aplicado o desconto.
      * @return O valor do desconto.
      */
-    default BigDecimal calcularDesconto(int percentualDesconto, ItemPedido itemPedido) {
+    default void calcularDesconto(int percentualDesconto, ItemPedido itemPedido) {
 
         verificarLimitesDesconto(percentualDesconto);
 
@@ -63,10 +65,11 @@ public interface Desconto {
 
         var vlrDesconto = itemPedido.getValorUnitario()
                 .multiply(BigDecimal.valueOf(descontoDecimal)
-                //Seta 2 casas decimais e o arredondamento
-        ).setScale(2, RoundingMode.HALF_UP);
+                        //Seta 2 casas decimais e o arredondamento
+                ).setScale(2, RoundingMode.HALF_UP);
 
-        return vlrDesconto;
+        //Seta o desconto calculado no ItemPedido
+        itemPedido.setValorDesconto(vlrDesconto);
     }
 
 }

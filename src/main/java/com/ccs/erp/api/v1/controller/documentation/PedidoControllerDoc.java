@@ -31,23 +31,23 @@ public interface PedidoControllerDoc {
     })
     CompletableFuture<PedidoResponse> getById(UUID id);
 
-    @Operation(summary = "Cdastrar", description = "Cadastra um Pedido")
+    @Operation(summary = "Cadastrar", description = "Cadastra um Pedido")
     CompletableFuture<PedidoResponse> save(PedidoInput pedidoInput);
 
     @Operation(summary = "Excluir", description = "Excluí um Pedido somente")
     @Parameter(name = "id", description = "ID do pedido a ser removido", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     ResponseEntity<Void> delete(UUID id);
 
-    @Operation(summary = "Aualizar", description = "Atualiza os atributos de um Pedido.")
+    @Operation(summary = "Atualizar", description = "Atualiza os atributos de um Pedido.")
     @Parameter(name = "id", description = "ID do pedido a ser atualizado", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     CompletableFuture<PedidoResponse> update(PedidoInput pedidoInput,
                                            UUID id);
 
     @Operation(summary = "Abrir", description = "Abre o Pedido")
     @Parameter(name = "id", description = "ID do Pedido a ser aberto")
-    ResponseEntity<Void> aberto(UUID id);
+    CompletableFuture<Void> aberto(UUID id);
 
     @Operation(summary = "Fechar", description = "Fecha um Pedido")
     @Parameter(name = "id", description = "ID do Pedido a ser fechado")
-    ResponseEntity<Void> fechado(UUID id);
+    CompletableFuture<Void> fechado(UUID id);
 }

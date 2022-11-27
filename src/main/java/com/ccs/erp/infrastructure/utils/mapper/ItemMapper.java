@@ -24,7 +24,7 @@ public final class ItemMapper extends AbstractMapper<ItemResponse, ItemInput, It
                 .add(linkTo(methodOn(ItemController.class).delete(item.getId())).withRel("delete"))
                 .add(linkTo(methodOn(ItemController.class).ativar(item.getId())).withRel("ativar"))
                 .add(linkTo(methodOn(ItemController.class).inativar(item.getId())).withRel("inativar"))
-                .add(linkTo(ItemController.class).withRel("items"));
+                .add(linkTo(ItemController.class).withRel("itens"));
     }
 
     @Override

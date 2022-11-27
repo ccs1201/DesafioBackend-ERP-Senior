@@ -27,13 +27,14 @@ public class RootEntryPointControllerV1 {
     protected CompletableFuture<RootEntryPointModelV1> getRootEntrypoint() {
 
         return supplyAsync(() -> {
-            var root = new RootEntryPointModelV1();
+                    var root = new RootEntryPointModelV1();
 
-            root.add(linkTo(ItemController.class).withRel("itens"))
-                    .add(linkTo(PedidoController.class).withRel("pedidos"));
+                    root.add(linkTo(ItemController.class).withRel("itens"))
+                            .add(linkTo(PedidoController.class).withRel("pedidos"));
 
-            return root;
-        }, ForkJoinPool.commonPool());
+                    return root;
+                }, ForkJoinPool.commonPool()
+        );
 
     }
 

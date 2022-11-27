@@ -26,7 +26,7 @@ public interface ItemControllerDoc {
     CompletableFuture<Page<ItemResponse>> getAll(Pageable pageable);
 
 
-    @Operation(summary = "Buscar", description = "Busca um Item pelo seu ID")
+    @Operation(summary = "Encontrar", description = "Busca um Item pelo seu ID")
     @Parameters({
             @Parameter(name = "id", description = "ID do item a ser encontrado", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     })
@@ -40,7 +40,7 @@ public interface ItemControllerDoc {
 
     @Operation(summary = "Excluir", description = "Excluí um item somente se ele não estiver a associado a um pedido")
     @Parameter(name = "id", description = "ID do item a ser removido", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    ResponseEntity<Void> delete(UUID id);
+    CompletableFuture<Void> delete(UUID id);
 
     @Operation(summary = "Atualizar", description = "Atualiza os atributos de um Item.")
     @Parameter(name = "id", description = "ID do item a ser atualizado", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
@@ -49,9 +49,9 @@ public interface ItemControllerDoc {
 
     @Operation(summary = "Ativa", description = "Ativa um item")
     @Parameter(name = "id", description = "ID do item a ser ativado")
-    ResponseEntity<Void> ativar(UUID id);
+    CompletableFuture<Void> ativar(UUID id);
 
     @Operation(summary = "Inativa", description = "Inativa um item")
     @Parameter(name = "id", description = "ID do item a ser inativado")
-    ResponseEntity<Void> inativar(UUID id);
+    CompletableFuture<Void> inativar(UUID id);
 }

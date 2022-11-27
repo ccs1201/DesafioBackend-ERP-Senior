@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 
 @Getter
@@ -13,6 +15,8 @@ import java.util.Collection;
 @Schema(name = "Pedido Input", description = "Modelo de entrada de um pedido")
 public class PedidoInput {
     @Valid
+    @Size(min = 1)
+    @NotNull
     private Collection<ItemPedidoInput> itensPedido;
 
     @Length(max = 150)

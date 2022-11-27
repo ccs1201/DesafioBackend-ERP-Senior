@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +23,7 @@ import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 @RestController
-@RequestMapping("/api/v1/itens")
+@RequestMapping(value = "/api/v1/itens", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ItemController implements ItemControllerDoc {
 
@@ -36,9 +36,9 @@ public class ItemController implements ItemControllerDoc {
     public CompletableFuture<Page<ItemResponse>> getAll(@Nullable @PageableDefault Pageable pageable) {
 
         return supplyAsync(() ->
-                service.findAll(pageable),
-                ForkJoinPool.commonPool()
-        ).thenApply(mapper::toPage);
+                        service.findAll(pageable),
+                ForkJoinPool.commonPool())
+                .thenApply(mapper::toPage);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ItemController implements ItemControllerDoc {
     public CompletableFuture<ItemResponse> getById(@PathVariable UUID id) {
 
         return supplyAsync((() ->
-                service.findById(id)),
+                        service.findById(id)),
                 ForkJoinPool.commonPool())
                 .thenApply(mapper::toModel);
     }
@@ -58,7 +58,7 @@ public class ItemController implements ItemControllerDoc {
     public CompletableFuture<ItemResponse> cadastrarServico(@RequestBody @Valid ItemInput itemInput) {
 
         return supplyAsync(() ->
-                service.cadastrarServico(mapper.toEntity(itemInput)),
+                        service.cadastrarServico(mapper.toEntity(itemInput)),
                 ForkJoinPool.commonPool())
                 .thenApply(mapper::toModel);
     }
@@ -75,13 +75,11 @@ public class ItemController implements ItemControllerDoc {
     @Override
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public CompletableFuture<Void> delete(@PathVariable UUID id) {
 
-        runAsync(() ->
+        return runAsync(() ->
                         service.deleteById(id)
                 , ForkJoinPool.commonPool());
-
-        return ResponseEntity.noContent().build();
     }
 
     @Override
@@ -90,8 +88,8 @@ public class ItemController implements ItemControllerDoc {
     public CompletableFuture<ItemResponse> update(@RequestBody @Valid ItemInput itemInput,
                                                   @PathVariable UUID id) {
         return supplyAsync(() ->
-                service.update(
-                        mapper.toEntity(itemInput), id),
+                        service.update(
+                                mapper.toEntity(itemInput), id),
                 ForkJoinPool.commonPool())
                 .thenApply(mapper::toModel);
     }
@@ -99,23 +97,23 @@ public class ItemController implements ItemControllerDoc {
     @Override
     @PatchMapping("/{id}/ativo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> ativar(@PathVariable UUID id) {
+    public CompletableFuture<Void> ativar(@PathVariable UUID id) {
         runAsync(() ->
-                service.ativar(id),
+                        service.ativar(id),
                 ForkJoinPool.commonPool()
         );
+
         return null;
     }
 
     @Override
     @PatchMapping("/{id}/inativo")
-    public ResponseEntity<Void> inativar(@PathVariable UUID id) {
+    public CompletableFuture<Void> inativar(@PathVariable UUID id) {
 
         runAsync(() ->
-                service.inativar(id),
+                        service.inativar(id),
                 ForkJoinPool.commonPool()
         );
         return null;
     }
-
 }

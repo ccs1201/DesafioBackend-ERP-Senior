@@ -4,6 +4,7 @@ import com.ccs.erp.domain.desconto.Desconto;
 import com.ccs.erp.infrastructure.exception.DescontoException;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@DynamicUpdate
 public class Pedido {
 
     @Id
@@ -28,22 +30,16 @@ public class Pedido {
     @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false)
     private UUID id;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pedido")
     private Collection<ItemPedido> itensPedido;
     @Column(nullable = false)
     @PositiveOrZero
     private BigDecimal valorTotalItens;
-
     private BigDecimal valorTotalDesconto;
-
     private BigDecimal valorTotalPedido;
-
     @Enumerated(EnumType.STRING)
     private StatusPedido statusPedido;
-
     private int percentualDesconto;
-
 
     @Column(length = 150)
     private String observacao;
@@ -54,7 +50,11 @@ public class Pedido {
     @UpdateTimestamp
     private OffsetDateTime ultimaAtualizacao;
 
-
+    /**
+     * <p>Adiciona um item ao Pedido</p>
+     *
+     * @param itemPedido Item a ser adicionado.
+     */
     public void addItemPedido(ItemPedido itemPedido) {
         itemPedido.setPedido(this);
         itensPedido.add(itemPedido);
@@ -75,7 +75,6 @@ public class Pedido {
 
         itensPedido.forEach((itemPedido ->
                 desconto.aplicarDesconto(percentualDesconto, itemPedido)
-
         ));
     }
 
@@ -95,22 +94,29 @@ public class Pedido {
     }
 
     /**
-     * <p>Calcula os totais para {@code totalPedido} e
-     * {@code totalDesconto} antes de persistir no banco</p>
+     * <p>Calcula os totais para {@code valorTotalPedido}, {@code valorTotalItens} e
+     * {@code valorTotalDesconto} antes de persistir no banco</p>
      */
     @PrePersist
     public void calcularTotaisPedido() {
+
+        valorTotalDesconto = BigDecimal.ZERO;
+        valorTotalItens = BigDecimal.ZERO;
+        valorTotalPedido = BigDecimal.ZERO;
 
         itensPedido.forEach(itemPedido -> {
             //Acumula o total do Pedido
             adicionaValorTotalItensPedido(itemPedido);
 
-            //Acumula o Total Desconto
-            adicionaDescontoItem(itemPedido);
+            if(percentualDesconto > 0){
+                //Acumula o Total Desconto
+                adicionaDescontoItem(itemPedido);
+            }
+
         });
 
         //calcula o valor do pedido
-        calcularValorFinalPedido();
+        calcularValorTotalPedido();
     }
 
     /**
@@ -118,7 +124,7 @@ public class Pedido {
      * <br>
      * <p> {@code valorTotalItens} - {@code valorTotalDesconto}</p>
      */
-    private void calcularValorFinalPedido() {
+    private void calcularValorTotalPedido() {
         valorTotalPedido = valorTotalItens
                 .subtract(valorTotalDesconto)
                 .setScale(2, RoundingMode.HALF_UP);
@@ -143,7 +149,6 @@ public class Pedido {
      * @param itemPedido
      */
     private void adicionaValorTotalItensPedido(ItemPedido itemPedido) {
-
         valorTotalItens = valorTotalItens
                 .add(itemPedido.getValorTotalItem())
                 .setScale(2, RoundingMode.HALF_UP);

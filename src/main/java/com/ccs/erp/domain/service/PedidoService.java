@@ -2,6 +2,8 @@ package com.ccs.erp.domain.service;
 
 import com.ccs.erp.domain.entity.Pedido;
 import com.ccs.erp.domain.repository.PedidoRepository;
+import com.ccs.erp.infrastructure.exception.ItemNaoEncontradoException;
+import com.ccs.erp.infrastructure.exception.PedidoException;
 import com.ccs.erp.infrastructure.exception.PedidoNaoEncontradoException;
 import com.ccs.erp.infrastructure.exception.RepositoryEntityPersistException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class PedidoService {
 
     private final PedidoRepository repository;
+    private final ItemService itemService;
 
     @Transactional(readOnly = true)
     public Page<Pedido> findAll(Pageable pageable) {
@@ -32,8 +35,8 @@ public class PedidoService {
                 () -> new PedidoNaoEncontradoException(id));
     }
 
-    @Transactional
-    public Pedido save(Pedido pedido) {
+
+    private Pedido save(Pedido pedido) {
         try {
             return repository.save(pedido);
         } catch (IllegalArgumentException e) {
@@ -69,5 +72,37 @@ public class PedidoService {
         var pedido = this.findById(id);
         pedido.abrir();
         this.save(pedido);
+    }
+
+    @Transactional
+    public Pedido CadastrarPedido(Pedido pedido) {
+
+        pedido.abrir();
+
+        getItens(pedido);
+        this.save(pedido);
+
+        return pedido;
+    }
+
+    /**
+     * <p>Busca no banco os Itens do pedido e seta
+     * no {@link com.ccs.erp.domain.entity.Item} do <br>
+     * {@link  com.ccs.erp.domain.entity.ItemPedido}</p>
+     *
+     * @param pedido O pedido que precisa dos itens populados
+     */
+    private void getItens(Pedido pedido) {
+
+        try {
+
+            pedido.getItensPedido().forEach((itemPedido ->
+                    itemPedido.setItem(itemService.findById(itemPedido.getItem().getId()))
+            ));
+
+        } catch (ItemNaoEncontradoException e) {
+            throw new PedidoException(e.getMessage());
+
+        }
     }
 }

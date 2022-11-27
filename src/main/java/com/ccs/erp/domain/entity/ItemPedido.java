@@ -67,6 +67,7 @@ public class ItemPedido {
     }
 
     public BigDecimal getValorDesconto() {
+
         calcularTotalDesconto();
         return valorDesconto;
     }

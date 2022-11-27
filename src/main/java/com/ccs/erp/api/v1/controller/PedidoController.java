@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 @RestController
-@RequestMapping("/v1/pedidos")
+@RequestMapping(value = "/api/v1/pedidos", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Schema(name = "Pedidos", description = "EndPoints de Pedidos")
 public class PedidoController implements PedidoControllerDoc {
@@ -56,7 +57,7 @@ public class PedidoController implements PedidoControllerDoc {
     @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<PedidoResponse> save(@RequestBody @Valid PedidoInput pedidoInput) {
         return supplyAsync(() ->
-                service.save(mapper.toEntity(pedidoInput)), ForkJoinPool.commonPool())
+                service.CadastrarPedido(mapper.toEntity(pedidoInput)), ForkJoinPool.commonPool())
                 .thenApply(mapper::toModel);
     }
 
@@ -80,23 +81,23 @@ public class PedidoController implements PedidoControllerDoc {
     }
 
     @Override
-    @PatchMapping("/{id}/abre")
+    @PatchMapping("/{id}/aberto")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> aberto(@PathVariable UUID id) {
+    public CompletableFuture<Void> aberto(@PathVariable UUID id) {
 
         runAsync(() ->
                 service.abrirPedido(id), ForkJoinPool.commonPool()
         );
-        return ResponseEntity.noContent().build();
+        return null;
     }
 
     @Override
-    @PatchMapping("/{id}/fecha")
+    @PatchMapping("/{id}/fechado")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> fechado(@PathVariable UUID id) {
+    public CompletableFuture<Void> fechado(@PathVariable UUID id) {
         runAsync(() ->
                 service.fecharPedido(id), ForkJoinPool.commonPool()
         );
-        return ResponseEntity.noContent().build();
+        return null;
     }
 }

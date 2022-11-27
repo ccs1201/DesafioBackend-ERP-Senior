@@ -4,6 +4,8 @@ import com.ccs.erp.domain.entity.ItemPedido;
 import com.ccs.erp.domain.entity.TipoItem;
 import lombok.AllArgsConstructor;
 
+import java.math.BigDecimal;
+
 @AllArgsConstructor
 public class DescontoSomenteProduto implements Desconto {
 
@@ -13,10 +15,12 @@ public class DescontoSomenteProduto implements Desconto {
         //Se o item for um Produto aplica o desconto
         if (itemPedido.getItem().getTipoItem().equals(TipoItem.PRODUTO)) {
 
-            //Calcula o valor do desconto
-            var vlrDesconto = calcularDesconto(percentualDesconto, itemPedido);
+            //Calcula o valor do desconto para o ItemPedido
+            calcularDesconto(percentualDesconto, itemPedido);
 
-            itemPedido.setValorDesconto(vlrDesconto);
+        } else {
+            //se não for aplicado desconto seta o valorDesconto como ZERO
+            itemPedido.setValorDesconto(BigDecimal.ZERO);
         }
     }
 }

@@ -26,6 +26,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -68,7 +69,9 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> unCaughtHandler(Exception e) {
-        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Uncaught error, please contact SYS Admin. Details: %s", e.getMessage()), "An unexpected error occur.");
+        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR,
+                String.format("Erro inesperado, por favor contate o administrador do sistema. Detalhes: %s",
+                        e.getMessage()), "Ocorreu um erro inesperado.");
     }
 
     /**
@@ -81,8 +84,8 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     public ResponseEntity<Object> runTimeExceptionHandler(RuntimeException e) {
 
         return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR,
-                String.format("Uncaught error, please contact SYS Admin. Details: %s", e.getMessage()),
-                "An unexpected error occur.");
+                String.format("Erro inesperado, por favor contate o administrador do sistema. Detalhes: %s",
+                        e.getMessage()), "Ocorreu um erro inesperado.");
     }
 
     /**
@@ -96,10 +99,24 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        log.error("handleMethodArgumentNotValid", ex);
         return ResponseEntity.status(status).body(buildWithFieldValidationsError(ex, status));
     }
 
-    @ExceptionHandler(value = {DataIntegrityViolationException.class})
+    @ExceptionHandler(PedidoException.class)
+    protected ResponseEntity<Object> handlePedidoException(PedidoException e){
+        log.error("handlePedidoException", e);
+        return buildResponseEntity(HttpStatus.PRECONDITION_FAILED,e,"Erro ao cadastrar Pedido");
+
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        log.error("handleHttpRequestMethodNotSupported", ex);
+        return buildResponseEntity(status, ex, "Método HTTP Não suportado");
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
 //    @ApiResponse(responseCode = "409", description = "Violação da integridade dos dados.")
     ResponseEntity<Object> constraintViolationExceptionHandler(ConstraintViolationException e) {
 
@@ -203,19 +220,11 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
         return buildResponseEntity(HttpStatus.BAD_REQUEST, e, INVALID_FIELD_VALUES);
     }
 
-//    @ExceptionHandler(RelatorioJasperException.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ApiResponse(responseCode = "500", description = "Report generation error")
-//    public ResponseEntity<?> relatorioJasperExceptionHandler(RelatorioJasperException e) {
-//        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e, "Erro ao gerar relatório");
-//    }
 
-  /*  @ExceptionHandler(NullPointerException.class)
-    @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
-    @ApiResponse(responseCode = "412", description = "malformed data")
-    public ResponseEntity<?> jsonParseExceptionHandler(NullPointerException e){
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<?> jsonParseExceptionHandler(NullPointerException e) {
         return buildResponseEntity(HttpStatus.PRECONDITION_FAILED, e);
-    }*/
+    }
 
 
     @Override

@@ -7,9 +7,8 @@ public class DescontoItem implements Desconto {
     @Override
     public void aplicarDesconto(int percentualDesconto, ItemPedido itemPedido) {
 
-        //Calcula o valor do desconto
-        var vlrDesconto = calcularDesconto(percentualDesconto, itemPedido);
+        //Calcula o valor do desconto do itemPedido
+        calcularDesconto(percentualDesconto, itemPedido);
 
-        itemPedido.setValorDesconto(vlrDesconto);
     }
 }

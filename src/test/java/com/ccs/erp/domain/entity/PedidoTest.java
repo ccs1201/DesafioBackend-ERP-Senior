@@ -18,27 +18,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PedidoTest {
 
     private static final int PERCENTUAL_DESCONTO_ZERO = 0;
-
     private static final int PERCENTUAL_DESCONTO_NEGATIVO = -1;
-
     private static final int PERCENTUAL_DESCONTO_MAIOR_MAXIMO = 101;
-
     private static final int PERCENTUAL_DESCONTO_CEM = 100;
-
     private final int PERCENTUAL_DESCONTO_DEZ = 10;
-
     private final BigDecimal VALOR_ITEM = BigDecimal.valueOf(100);
-
     private final int QTD = 10;
-
     private Item itemProduto;
-
     private Item itemServico;
-
     private ItemPedido itemPedidoProduto;
-
     private ItemPedido itemPedidoServico;
-
     private Pedido pedido;
 
     @BeforeEach
@@ -60,22 +49,22 @@ class PedidoTest {
 
         this.itemPedidoProduto = ItemPedido.builder()
                 .item(itemProduto)
-                .valorDesconto(BigDecimal.ZERO)
+//                .valorDesconto(BigDecimal.ZERO)
                 .qtd(QTD)
                 .build();
 
         this.itemPedidoServico = ItemPedido.builder()
                 .item(itemServico)
-                .valorDesconto(BigDecimal.ZERO)
+//                .valorDesconto(BigDecimal.ZERO)
                 .qtd(QTD)
                 .build();
 
         this.pedido = Pedido.builder()
                 .observacao("Teste TESTE Teste")
                 .itensPedido(new ArrayList<>())
-                .valorTotalDesconto(BigDecimal.ZERO)
-                .valorTotalPedido(BigDecimal.ZERO)
-                .valorTotalItens(BigDecimal.ZERO)
+//                .valorTotalDesconto(BigDecimal.ZERO)
+//                .valorTotalPedido(BigDecimal.ZERO)
+//                .valorTotalItens(BigDecimal.ZERO)
                 .statusPedido(StatusPedido.ABERTO)
                 .build();
         this.pedido.addItemPedido(itemPedidoProduto);
@@ -151,7 +140,7 @@ class PedidoTest {
     }
 
     @Test
-    @DisplayName("Testa desconto CEM porcento")
+    @DisplayName("Testa desconto CEM por cento")
     void testaDescontoCem() {
 
         BigDecimal totalDescontoExpected = BigDecimal.valueOf(2000).setScale(2);

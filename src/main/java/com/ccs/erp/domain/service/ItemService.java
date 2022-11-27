@@ -61,7 +61,7 @@ public class ItemService {
     public Item update(Item item, UUID uuid) {
 
         var itemNoBanco = this.findById(uuid);
-        BeanUtils.copyProperties(item, itemNoBanco, "id");
+        BeanUtils.copyProperties(item, itemNoBanco, "id", "tipoItem");
 
         try {
             return repository.save(itemNoBanco);
