@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -35,8 +36,9 @@ public class ItemController implements ItemControllerDoc {
     public CompletableFuture<Page<ItemResponse>> getAll(@Nullable @PageableDefault Pageable pageable) {
 
         return supplyAsync(() ->
-                mapper.toPage(service.findAll(pageable))
-        );
+                service.findAll(pageable),
+                ForkJoinPool.commonPool()
+        ).thenApply(mapper::toPage);
     }
 
     @Override
@@ -45,20 +47,29 @@ public class ItemController implements ItemControllerDoc {
     public CompletableFuture<ItemResponse> getById(@PathVariable UUID id) {
 
         return supplyAsync((() ->
-                mapper.toModel(service.findById(id))
-        ));
+                service.findById(id)),
+                ForkJoinPool.commonPool())
+                .thenApply(mapper::toModel);
     }
 
     @Override
-    @PostMapping
+    @PostMapping("/servico")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<ItemResponse> save(@RequestBody @Valid ItemInput itemInput) {
+    public CompletableFuture<ItemResponse> cadastrarServico(@RequestBody @Valid ItemInput itemInput) {
 
         return supplyAsync(() ->
-                mapper.toModel(
-                        service.save(mapper.toEntity(itemInput))
-                )
-        );
+                service.cadastrarServico(mapper.toEntity(itemInput)),
+                ForkJoinPool.commonPool())
+                .thenApply(mapper::toModel);
+    }
+
+    @PostMapping("/produto")
+    @ResponseStatus(HttpStatus.OK)
+    public CompletableFuture<ItemResponse> cadastrarProduto(@RequestBody @Valid ItemInput itemInput) {
+        return supplyAsync(() ->
+                        service.cadastrarProduto(mapper.toEntity(itemInput))
+                , ForkJoinPool.commonPool())
+                .thenApply(mapper::toModel);
     }
 
     @Override
@@ -67,8 +78,9 @@ public class ItemController implements ItemControllerDoc {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
 
         runAsync(() ->
-                service.deleteById(id)
-        );
+                        service.deleteById(id)
+                , ForkJoinPool.commonPool());
+
         return ResponseEntity.noContent().build();
     }
 
@@ -78,12 +90,10 @@ public class ItemController implements ItemControllerDoc {
     public CompletableFuture<ItemResponse> update(@RequestBody @Valid ItemInput itemInput,
                                                   @PathVariable UUID id) {
         return supplyAsync(() ->
-                mapper.toModel(
-                        service.update(
-                                mapper.toEntity(itemInput), id)
-                )
-
-        );
+                service.update(
+                        mapper.toEntity(itemInput), id),
+                ForkJoinPool.commonPool())
+                .thenApply(mapper::toModel);
     }
 
     @Override
@@ -91,7 +101,8 @@ public class ItemController implements ItemControllerDoc {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> ativar(@PathVariable UUID id) {
         runAsync(() ->
-                service.ativar(id)
+                service.ativar(id),
+                ForkJoinPool.commonPool()
         );
         return null;
     }
@@ -101,7 +112,8 @@ public class ItemController implements ItemControllerDoc {
     public ResponseEntity<Void> inativar(@PathVariable UUID id) {
 
         runAsync(() ->
-                service.inativar(id)
+                service.inativar(id),
+                ForkJoinPool.commonPool()
         );
         return null;
     }

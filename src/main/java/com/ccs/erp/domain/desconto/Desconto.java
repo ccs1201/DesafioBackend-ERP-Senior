@@ -1,7 +1,7 @@
 package com.ccs.erp.domain.desconto;
 
 import com.ccs.erp.domain.entity.ItemPedido;
-import com.ccs.erp.infrastructure.exception.ValorDescontoNaoPermitidoException;
+import com.ccs.erp.infrastructure.exception.DescontoPercentualNaoPermitidoException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,11 +18,11 @@ public interface Desconto {
      * <p>Os limites são: inferior é 1 e o superior 100</p>
      * <br>
      *
-     * @throws ValorDescontoNaoPermitidoException se um dos limiter for ultrapassado.
+     * @throws DescontoPercentualNaoPermitidoException se um dos limiter for ultrapassado.
      */
     private void verificarLimitesDesconto(int percentualDesconto) {
         if (percentualDesconto > 100 || percentualDesconto < 1) {
-            throw new ValorDescontoNaoPermitidoException(
+            throw new DescontoPercentualNaoPermitidoException(
                     String.format("O desconto de %d, não é permitido, entre com um valor entre 1 e 100.", percentualDesconto)
             );
         }

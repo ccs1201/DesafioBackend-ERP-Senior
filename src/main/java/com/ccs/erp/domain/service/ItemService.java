@@ -1,10 +1,12 @@
 package com.ccs.erp.domain.service;
 
 import com.ccs.erp.domain.entity.Item;
+import com.ccs.erp.domain.entity.TipoItem;
 import com.ccs.erp.domain.repository.ItemRepository;
 import com.ccs.erp.infrastructure.exception.ItemJaCadastradoException;
 import com.ccs.erp.infrastructure.exception.ItemNaoEncontradoException;
 import com.ccs.erp.infrastructure.exception.ItemUpdateException;
+import com.ccs.erp.infrastructure.exception.RepositoryEntityPersistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
@@ -41,6 +43,9 @@ public class ItemService {
             log.error("Erro ao salvar Item", e);
             throw new ItemJaCadastradoException(String
                     .format("Item %s, já está cadastrado, por favor verifique.", item.getNome()), e);
+        } catch (IllegalArgumentException e) {
+            log.error("Erro ao Salvar Item", e);
+            throw new RepositoryEntityPersistException("Ocorreu um erro inesperado ao salvar o item", e);
         }
 
     }
@@ -83,5 +88,15 @@ public class ItemService {
         var item = this.findById(id);
         item.inativa();
         this.save(item);
+    }
+
+    public Item cadastrarProduto(Item item) {
+        item.setTipoItem(TipoItem.PRODUTO);
+        return this.save(item);
+    }
+
+    public Item cadastrarServico(Item item) {
+        item.setTipoItem(TipoItem.SERVICO);
+        return this.save(item);
     }
 }

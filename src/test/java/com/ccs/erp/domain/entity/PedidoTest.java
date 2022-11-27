@@ -3,7 +3,8 @@ package com.ccs.erp.domain.entity;
 import com.ccs.erp.domain.desconto.DescontoItem;
 import com.ccs.erp.domain.desconto.DescontoSomenteProduto;
 import com.ccs.erp.domain.desconto.DescontoSomenteServico;
-import com.ccs.erp.infrastructure.exception.ValorDescontoNaoPermitidoException;
+import com.ccs.erp.infrastructure.exception.DescontoException;
+import com.ccs.erp.infrastructure.exception.DescontoPercentualNaoPermitidoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class PedidoTest {
                 .build();
 
         this.itemServico = Item.builder()
-                .tipoItem(TipoItem.SERVIÇO)
+                .tipoItem(TipoItem.SERVICO)
                 .valor(VALOR_ITEM)
                 .ativo(true)
                 .nome("Item Serviço")
@@ -194,36 +195,33 @@ class PedidoTest {
     @Test
     @DisplayName("Testa Desconto ZERO")
     void testaDescontoZero() {
-        BigDecimal totalDescontoExpected = BigDecimal.valueOf(100).setScale(2);
 
         var desconto = new DescontoItem();
         pedido.calcularTotaisPedido();
 
-        assertThrows(ValorDescontoNaoPermitidoException.class,
+        assertThrows(DescontoPercentualNaoPermitidoException.class,
                 () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_ZERO, desconto));
     }
 
     @Test
     @DisplayName("Testa Desconto Negativo")
     void testaDescontoNegativo() {
-        BigDecimal totalDescontoExpected = BigDecimal.valueOf(100).setScale(2);
 
         var desconto = new DescontoItem();
         pedido.calcularTotaisPedido();
 
-        assertThrows(ValorDescontoNaoPermitidoException.class,
+        assertThrows(DescontoPercentualNaoPermitidoException.class,
                 () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_NEGATIVO, desconto));
     }
 
     @Test
     @DisplayName("Testa Desconto Maior que 100")
     void testaDescontoMaioRQueCem() {
-        BigDecimal totalDescontoExpected = BigDecimal.valueOf(100).setScale(2);
 
         var desconto = new DescontoItem();
         pedido.calcularTotaisPedido();
 
-        assertThrows(ValorDescontoNaoPermitidoException.class,
+        assertThrows(DescontoPercentualNaoPermitidoException.class,
                 () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_MAIOR_MAXIMO, desconto));
     }
 
@@ -247,6 +245,16 @@ class PedidoTest {
         pedido.calcularTotaisPedido();
 
         assertEquals(totalItensExpected, pedido.getValorTotalItens());
+    }
+
+    @Test
+    @DisplayName("Testa aplicar desconto com pedido fechado")
+    void testaAplicarDescontoPedidoFechado() {
+        pedido.setStatusPedido(StatusPedido.FECHADO);
+
+        assertThrows(DescontoException.class,
+                () ->
+                        pedido.aplicarDesconto(1, new DescontoItem()));
     }
 
 }

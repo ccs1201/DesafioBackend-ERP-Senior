@@ -1,12 +1,16 @@
 package com.ccs.erp.domain.entity;
 
 import com.ccs.erp.domain.desconto.Desconto;
+import com.ccs.erp.infrastructure.exception.DescontoException;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -41,7 +45,14 @@ public class Pedido {
     private int percentualDesconto;
 
 
+    @Column(length = 150)
     private String observacao;
+
+    @CreationTimestamp
+    private OffsetDateTime dataPedido;
+
+    @UpdateTimestamp
+    private OffsetDateTime ultimaAtualizacao;
 
 
     public void addItemPedido(ItemPedido itemPedido) {
@@ -57,12 +68,30 @@ public class Pedido {
      * @param desconto           Interface que represent ao tipo de desconto a ser aplicado.
      */
     public void aplicarDesconto(int percentualDesconto, Desconto desconto) {
+
+        this.podeAplicarDesconto();
+
         this.percentualDesconto = percentualDesconto;
 
         itensPedido.forEach((itemPedido ->
                 desconto.aplicarDesconto(percentualDesconto, itemPedido)
 
         ));
+    }
+
+    /**
+     * <p>Verifica se um desconto pode ser aplicado</p>
+     * <p>A regra de negocio define que somente pedido
+     * com status aberto podem ter desconto. <br>
+     * Por tanto se o pedido estiver com status fechado
+     * lançamos uma exceção.
+     *
+     * </p>
+     */
+    private void podeAplicarDesconto() {
+        if (statusPedido.equals(StatusPedido.FECHADO)) {
+            throw new DescontoException("Pedido com status fechado, não é possível aplicar desconto.");
+        }
     }
 
     /**
@@ -73,10 +102,10 @@ public class Pedido {
     public void calcularTotaisPedido() {
 
         itensPedido.forEach(itemPedido -> {
-            //Calcula o total do Pedido
+            //Acumula o total do Pedido
             adicionaValorTotalItensPedido(itemPedido);
 
-            //Calcula o Total Desconto
+            //Acumula o Total Desconto
             adicionaDescontoItem(itemPedido);
         });
 
@@ -118,5 +147,13 @@ public class Pedido {
         valorTotalItens = valorTotalItens
                 .add(itemPedido.getValorTotalItem())
                 .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public void fechar() {
+        statusPedido = StatusPedido.FECHADO;
+    }
+
+    public void abrir() {
+        statusPedido = StatusPedido.ABERTO;
     }
 }

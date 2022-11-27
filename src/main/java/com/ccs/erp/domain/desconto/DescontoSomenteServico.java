@@ -9,7 +9,7 @@ public class DescontoSomenteServico implements Desconto {
     public void aplicarDesconto(int percentualDesconto, ItemPedido itemPedido) {
 
         //Se o item for um SERVIÇO aplica o desconto
-        if (itemPedido.getItem().getTipoItem().equals(TipoItem.SERVIÇO)) {
+        if (itemPedido.getItem().getTipoItem().equals(TipoItem.SERVICO)) {
 
             //Calcula o valor do desconto
             var vlrDesconto = calcularDesconto(percentualDesconto, itemPedido);

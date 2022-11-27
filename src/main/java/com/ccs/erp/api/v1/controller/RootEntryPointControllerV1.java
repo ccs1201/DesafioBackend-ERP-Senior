@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -28,10 +29,11 @@ public class RootEntryPointControllerV1 {
         return supplyAsync(() -> {
             var root = new RootEntryPointModelV1();
 
-            root.add(linkTo(ItemController.class).withRel("itens"));
+            root.add(linkTo(ItemController.class).withRel("itens"))
+                    .add(linkTo(PedidoController.class).withRel("pedidos"));
 
             return root;
-        });
+        }, ForkJoinPool.commonPool());
 
     }
 

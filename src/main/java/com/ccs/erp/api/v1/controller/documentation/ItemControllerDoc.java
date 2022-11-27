@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-@Tag(name = "Item")
+@Tag(name = "Itens")
 public interface ItemControllerDoc {
 
     @Operation(summary = "Listar", description = "Lista os Items cadastrados com paginação, se nenhum parâmetro" +
@@ -26,29 +26,32 @@ public interface ItemControllerDoc {
     CompletableFuture<Page<ItemResponse>> getAll(Pageable pageable);
 
 
-    @Operation(summary = "encontrar", description = "Recupera um Item pelo seu ID")
+    @Operation(summary = "Buscar", description = "Busca um Item pelo seu ID")
     @Parameters({
             @Parameter(name = "id", description = "ID do item a ser encontrado", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     })
     CompletableFuture<ItemResponse> getById(UUID id);
 
-    @Operation(summary = "salvar", description = "Grava um Item")
-    CompletableFuture<ItemResponse> save(ItemInput itemInput);
+    @Operation(summary = "Cadastrar Serviço", description = "Cadastra um Item como Serviço")
+    CompletableFuture<ItemResponse> cadastrarServico(ItemInput itemInput);
 
-    @Operation(summary = "excluir", description = "Excluí um item somente se ele não estiver a associado a um pedido")
+    @Operation(summary = "Cadastrar Produto", description = "Cadastra um Item como Produto")
+    public CompletableFuture<ItemResponse> cadastrarProduto(ItemInput itemInput);
+
+    @Operation(summary = "Excluir", description = "Excluí um item somente se ele não estiver a associado a um pedido")
     @Parameter(name = "id", description = "ID do item a ser removido", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     ResponseEntity<Void> delete(UUID id);
 
-    @Operation(summary = "atualizar", description = "Atualiza os atributos de um Item.")
+    @Operation(summary = "Atualizar", description = "Atualiza os atributos de um Item.")
     @Parameter(name = "id", description = "ID do item a ser atualizado", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     CompletableFuture<ItemResponse> update(ItemInput itemInput,
                                            UUID id);
 
-    @Operation(summary = "ativa", description = "Ativa um item")
+    @Operation(summary = "Ativa", description = "Ativa um item")
     @Parameter(name = "id", description = "ID do item a ser ativado")
     ResponseEntity<Void> ativar(UUID id);
 
-    @Operation(summary = "inatva", description = "Inativa um item")
+    @Operation(summary = "Inativa", description = "Inativa um item")
     @Parameter(name = "id", description = "ID do item a ser inativado")
     ResponseEntity<Void> inativar(UUID id);
 }
