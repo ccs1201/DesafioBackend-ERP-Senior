@@ -117,7 +117,6 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-//    @ApiResponse(responseCode = "409", description = "Violação da integridade dos dados.")
     ResponseEntity<Object> constraintViolationExceptionHandler(ConstraintViolationException e) {
 
         Throwable rootCause = ExceptionUtils.getRootCause(e);
@@ -126,7 +125,6 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(EntityValidationException.class)
-//    @ApiResponse(responseCode = "400", description = INVALID_FIELD_VALUES)
     public ResponseEntity<Object> entityValidationExceptionHandler(EntityValidationException e) {
 
         ApiValidationErrorResponse apiValidationErrorResponse = ApiValidationErrorResponse.builder()
@@ -141,7 +139,6 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(FieldValidationException.class)
-//    @ApiResponse(responseCode = "400", description = INVALID_FIELD_VALUES)
     public ResponseEntity<Object> fieldValidationExceptionHandler(FieldValidationException e) {
         return buildResponseEntity(
                 HttpStatus.BAD_REQUEST, e, INVALID_FIELD_VALUES);
@@ -149,25 +146,21 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
 
 
     @ExceptionHandler(RepositoryEntityNotFoundException.class)
-//    @ApiResponse(responseCode = "404", description = "Nenhum registro localizado para os parâmetros informados.")
     public ResponseEntity<?> entityNotFoundExceptionHandler(RepositoryEntityNotFoundException e) {
         return buildResponseEntity(HttpStatus.NOT_FOUND, e, "Nenhum registro localizado com os parâmetros informados.");
     }
 
     @ExceptionHandler(BusinessLogicException.class)
-//    @ApiResponse(responseCode = "400", description = "Ocorreu uma exceção de regra de negocio.")
     public ResponseEntity<?> businessLogicExceptionHandler(BusinessLogicException e) {
         return buildResponseEntity(HttpStatus.BAD_REQUEST, e, INVALID_FIELD_VALUES);
     }
 
     @ExceptionHandler(ServiceException.class)
-//    @ApiResponse(responseCode = "400", description = "Ocorreu uma exceção ma camada de serviço.")
     public ResponseEntity<Object> serviceExceptionHandler(ServiceException e) {
         return buildResponseEntity(HttpStatus.BAD_REQUEST, e, INVALID_FIELD_VALUES);
     }
 
     @ExceptionHandler(RepositoryEntityInUseException.class)
-//    @ApiResponse(responseCode = "409", description = "Registro em uso não pode ser removido")
     public ResponseEntity<?> entityInUseExceptionHandler(RepositoryEntityInUseException e) {
 
         return buildResponseEntity(HttpStatus.CONFLICT, e,
@@ -175,7 +168,6 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(RepositoryEntityPersistException.class)
-//    @ApiResponse(responseCode = "500", description = "O registro não pode gravado")
     public ResponseEntity<?> entityPersistExceptionHandler(RepositoryEntityPersistException e) {
         return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e, INVALID_FIELD_VALUES);
     }
@@ -188,7 +180,6 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
 //    }
 
     @ExceptionHandler(RepositoryEntityUpdateException.class)
-//    @ApiResponse(responseCode = "400", description = "Registro não pode ser atualizado")
     public ResponseEntity<?> entityUpdateExceptionHandler(RepositoryEntityUpdateException e) {
 
         Throwable rootCause = ExceptionUtils.getRootCause(e);
@@ -206,16 +197,12 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(RepositoryDataIntegrityViolationException.class)
-//    @ApiResponse(responseCode = "409", description = "Ocorreu uma violação de constraint")
     public ResponseEntity<?> repositoryDataIntegrityViolationExceptionHandler(RepositoryDataIntegrityViolationException e) {
-
-        //   Throwable rootCause = ExceptionUtils.getRootCause(e);
 
         return buildResponseEntity(HttpStatus.CONFLICT, e.getMessage(), INVALID_FIELD_VALUES);
     }
 
     @ExceptionHandler(JsonParseException.class)
-//    @ApiResponse(responseCode = "400", description = "Malformed data, check JSON syntax")
     public ResponseEntity<?> jsonParseExceptionHandler(JsonParseException e) {
         return buildResponseEntity(HttpStatus.BAD_REQUEST, e, INVALID_FIELD_VALUES);
     }

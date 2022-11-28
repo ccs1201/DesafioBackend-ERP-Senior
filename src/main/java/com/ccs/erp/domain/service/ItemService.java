@@ -5,11 +5,10 @@ import com.ccs.erp.domain.entity.TipoItem;
 import com.ccs.erp.domain.repository.ItemRepository;
 import com.ccs.erp.infrastructure.exception.ItemJaCadastradoException;
 import com.ccs.erp.infrastructure.exception.ItemNaoEncontradoException;
-import com.ccs.erp.infrastructure.exception.ItemUpdateException;
+import com.ccs.erp.infrastructure.exception.RepositoryEntityInUseException;
 import com.ccs.erp.infrastructure.exception.RepositoryEntityPersistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -47,41 +46,34 @@ public class ItemService {
             log.error("Erro ao Salvar Item", e);
             throw new RepositoryEntityPersistException("Ocorreu um erro inesperado ao salvar o item", e);
         }
-
     }
 
     @Transactional
     public void deleteById(UUID uuid) {
         var item = this.findById(uuid);
-
+    try {
         repository.delete(item);
+    } catch (DataIntegrityViolationException e){
+        throw new RepositoryEntityInUseException("Não é possível remover o item código: "+ uuid, e);
+
+    }
+
     }
 
     @Transactional
     public Item update(Item item, UUID uuid) {
-
         var itemNoBanco = this.findById(uuid);
+
         BeanUtils.copyProperties(item, itemNoBanco, "id", "tipoItem");
 
-        try {
-            return repository.save(itemNoBanco);
-
-        } catch (ConstraintViolationException | DataIntegrityViolationException | IllegalArgumentException e) {
-            log.error("Erro ao atualizar Item", e);
-            throw new ItemUpdateException(
-                    "Erro ao atualizar Item, verifique se já existe um item cadastrado com este nome.", e);
-        }
-
-
+        return this.save(itemNoBanco);
     }
 
     @Transactional
     public void ativar(UUID id) {
-
         var item = this.findById(id);
         item.ativa();
         this.save(item);
-
     }
 
     public void inativar(UUID id) {

@@ -50,13 +50,13 @@ class PedidoTest {
         this.itemPedidoProduto = ItemPedido.builder()
                 .item(itemProduto)
 //                .valorDesconto(BigDecimal.ZERO)
-                .qtd(QTD)
+                .quantidade(QTD)
                 .build();
 
         this.itemPedidoServico = ItemPedido.builder()
                 .item(itemServico)
 //                .valorDesconto(BigDecimal.ZERO)
-                .qtd(QTD)
+                .quantidade(QTD)
                 .build();
 
         this.pedido = Pedido.builder()

@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -36,7 +35,7 @@ public interface ItemControllerDoc {
     CompletableFuture<ItemResponse> cadastrarServico(ItemInput itemInput);
 
     @Operation(summary = "Cadastrar Produto", description = "Cadastra um Item como Produto")
-    public CompletableFuture<ItemResponse> cadastrarProduto(ItemInput itemInput);
+    CompletableFuture<ItemResponse> cadastrarProduto(ItemInput itemInput);
 
     @Operation(summary = "Excluir", description = "Excluí um item somente se ele não estiver a associado a um pedido")
     @Parameter(name = "id", description = "ID do item a ser removido", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")

@@ -98,10 +98,9 @@ public class PedidoService {
         //Busca os Itens que compõem o pedido
         getItens(pedido);
 
-        //Grava no Banco
-        pedido = this.save(pedido);
+        //Grava no Banco e retorna
+        return this.save(pedido);
 
-        return pedido;
     }
 
     /**
@@ -115,15 +114,21 @@ public class PedidoService {
 
         try {
             pedido.getItensPedido().forEach((itemPedido -> {
-                itemPedido.setItem(itemService.findById(itemPedido.getItem().getId()));
 
-                //seta o pedido no itemPedido
-                //para garantir o relacionamento
-                itemPedido.setPedido(pedido);
+                var item = itemService.findById(itemPedido.getItem().getId());
 
-                //seta o valorDesconto como ZERO
-                //para garantir a integridade do banco
-                itemPedido.setValorDesconto(BigDecimal.ZERO);
+                //O item só pode ser associado a um pedido se estiver ativo
+                if (item.getAtivo()) {
+                    itemPedido.setItem(item);
+
+                    //seta o pedido no itemPedido
+                    //para garantir o relacionamento
+                    itemPedido.setPedido(pedido);
+
+                    //seta o valorDesconto como ZERO
+                    //para garantir a integridade do banco
+                    itemPedido.setValorDesconto(BigDecimal.ZERO);
+                }
             }
             ));
 
