@@ -30,7 +30,7 @@ public class Pedido {
     @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false)
     private UUID id;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "pedido")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "pedido", cascade = CascadeType.ALL)
     private Collection<ItemPedido> itensPedido;
     @Column(nullable = false)
     @PositiveOrZero
