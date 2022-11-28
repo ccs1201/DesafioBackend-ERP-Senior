@@ -8,11 +8,12 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.math.BigDecimal;
 
-@JsonRootName("Item Pedido")
+
 @Getter
 @Setter
 @Schema(description = "Modelo de resposta para Item Pedido")
-public class ItemPedidoResponse extends RepresentationModel<ItemResponse> {
+@JsonRootName("Item Pedido")
+public class ItemPedidoResponse extends RepresentationModel<ItemPedidoResponse> {
 
     private ItemResponse item;
 
@@ -23,6 +24,5 @@ public class ItemPedidoResponse extends RepresentationModel<ItemResponse> {
     private BigDecimal valorTotalItem;
 
     private BigDecimal valorDesconto;
-
 
 }

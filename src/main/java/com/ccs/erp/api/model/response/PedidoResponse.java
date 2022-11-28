@@ -12,10 +12,11 @@ import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
-@JsonRootName("pedido")
+
 @Getter
 @Setter
 @Schema(description = "Modelo de resposta de Pedido")
+@JsonRootName("pedido")
 public class PedidoResponse extends RepresentationModel<PedidoResponse> {
 
     private UUID id;

@@ -15,7 +15,6 @@ import java.util.Collection;
 @Schema(name = "Pedido Input", description = "Modelo de entrada de um pedido")
 public class PedidoInput {
     @Valid
-    @Size(min = 1)
     @NotNull
     private Collection<ItemPedidoInput> itensPedido;
 

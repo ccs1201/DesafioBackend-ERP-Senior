@@ -55,9 +55,9 @@ public class PedidoController implements PedidoControllerDoc {
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<PedidoResponse> save(@RequestBody @Valid PedidoInput pedidoInput) {
+    public CompletableFuture<PedidoResponse> cadastrarNovoPedido(@RequestBody @Valid PedidoInput pedidoInput) {
         return supplyAsync(() ->
-                service.CadastrarPedido(mapper.toEntity(pedidoInput)), ForkJoinPool.commonPool())
+                service.CadastrarNovoPedido(mapper.toEntity(pedidoInput)), ForkJoinPool.commonPool())
                 .thenApply(mapper::toModel);
     }
 

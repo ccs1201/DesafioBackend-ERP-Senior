@@ -32,7 +32,7 @@ public interface PedidoControllerDoc {
     CompletableFuture<PedidoResponse> getById(UUID id);
 
     @Operation(summary = "Cadastrar", description = "Cadastra um Pedido")
-    CompletableFuture<PedidoResponse> save(PedidoInput pedidoInput);
+    CompletableFuture<PedidoResponse> cadastrarNovoPedido(PedidoInput pedidoInput);
 
     @Operation(summary = "Excluir", description = "Excluí um Pedido somente")
     @Parameter(name = "id", description = "ID do pedido a ser removido", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")

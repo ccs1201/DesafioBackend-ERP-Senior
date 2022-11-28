@@ -1,6 +1,7 @@
 package com.ccs.erp.api.model.response;
 
 import com.ccs.erp.domain.entity.TipoItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @JsonRootName("Item")
 public class ItemResponse extends RepresentationModel<ItemResponse> {
 
+    @JsonIgnore
     private UUID id;
 
     private String nome;

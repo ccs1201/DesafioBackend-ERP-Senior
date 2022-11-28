@@ -104,9 +104,9 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(PedidoException.class)
-    protected ResponseEntity<Object> handlePedidoException(PedidoException e){
+    protected ResponseEntity<Object> handlePedidoException(PedidoException e) {
         log.error("handlePedidoException", e);
-        return buildResponseEntity(HttpStatus.PRECONDITION_FAILED,e,"Erro ao cadastrar Pedido");
+        return buildResponseEntity(HttpStatus.PRECONDITION_FAILED, e, "Erro ao cadastrar Pedido");
 
     }
 
@@ -261,6 +261,8 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
 
         Throwable rootCause = ExceptionUtils.getRootCause(ex);
 
+        log.error("handleHttpMessageNotReadable", rootCause);
+
         if (rootCause instanceof JsonParseException) {
             return jsonParseExceptionHandler((JsonParseException) rootCause, status);
         }
@@ -323,18 +325,8 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     }
 
     private ResponseEntity<Object> jsonParseExceptionHandler(JsonParseException e, HttpStatus status) {
-        var errorResponse = buildApiValidationErrorResponse(status);
 
-        String message = e.getMessage()
-                .replace("\n at [Source: (org.springframework.util.StreamUtils$NonClosingInputStream); line: 4, column: 21]", "");
-
-        errorResponse.getDetails().add(
-                FieldValidationError
-                        .builder()
-                        .fieldValidationMessage(message)
-                        .build());
-
-        return ResponseEntity.status(status).body(errorResponse);
+        return buildResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY, e.getOriginalMessage(), "Formato de dados inválido.");
     }
 
     private ResponseEntity<Object> propertyBindingExceptionHandler(PropertyBindingException e, HttpStatus status) {

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -35,7 +36,14 @@ public class PedidoService {
                 () -> new PedidoNaoEncontradoException(id));
     }
 
-
+    /**
+     * <p>Método privado para salvar um {@link Pedido}
+     * deve ser chamado por métodos auxiliares que garantam
+     * a consistência dos dados do pedido antes de gravar no banco.</p>
+     *
+     * @param pedido O Pedido a ser salvo no banco.
+     * @return {@link Pedido}
+     */
     private Pedido save(Pedido pedido) {
         try {
             return repository.save(pedido);
@@ -74,13 +82,24 @@ public class PedidoService {
         this.save(pedido);
     }
 
+    /**
+     * <p>Cadastra um novo pedido</p>
+     * <p><b>Não deve ser usado para atualizar um pedido</b></p>
+     *
+     * @param pedido
+     * @return
+     */
     @Transactional
-    public Pedido CadastrarPedido(Pedido pedido) {
+    public Pedido CadastrarNovoPedido(Pedido pedido) {
 
+        //seta o status do pedido como ABERTO
         pedido.abrir();
 
+        //Busca os Itens que compõem o pedido
         getItens(pedido);
-        this.save(pedido);
+
+        //Grava no Banco
+        pedido = this.save(pedido);
 
         return pedido;
     }
@@ -95,14 +114,21 @@ public class PedidoService {
     private void getItens(Pedido pedido) {
 
         try {
+            pedido.getItensPedido().forEach((itemPedido -> {
+                itemPedido.setItem(itemService.findById(itemPedido.getItem().getId()));
 
-            pedido.getItensPedido().forEach((itemPedido ->
-                    itemPedido.setItem(itemService.findById(itemPedido.getItem().getId()))
+                //seta o pedido no itemPedido
+                //para garantir o relacionamento
+                itemPedido.setPedido(pedido);
+
+                //seta o valorDesconto como ZERO
+                //para garantir a integridade do banco
+                itemPedido.setValorDesconto(BigDecimal.ZERO);
+            }
             ));
 
         } catch (ItemNaoEncontradoException e) {
             throw new PedidoException(e.getMessage());
-
         }
     }
 }

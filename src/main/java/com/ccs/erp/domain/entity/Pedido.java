@@ -8,11 +8,14 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.UUID;
 
 @Entity
@@ -31,14 +34,19 @@ public class Pedido {
     @Column(name = "id", nullable = false)
     private UUID id;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pedido", cascade = CascadeType.ALL)
-    private Collection<ItemPedido> itensPedido;
+    private Collection<ItemPedido> itensPedido = new LinkedList<>();
+
     @Column(nullable = false)
     @PositiveOrZero
     private BigDecimal valorTotalItens;
+    @PositiveOrZero
     private BigDecimal valorTotalDesconto;
+    @Positive
     private BigDecimal valorTotalPedido;
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StatusPedido statusPedido;
+    @PositiveOrZero
     private int percentualDesconto;
 
     @Column(length = 150)
