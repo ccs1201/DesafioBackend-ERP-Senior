@@ -1,6 +1,6 @@
 package com.ccs.erp.domain.entity;
 
-import com.ccs.erp.infrastructure.exception.ValorItemNegativoException;
+import com.ccs.erp.core.exception.ValorItemNegativoException;
 import lombok.*;
 
 import javax.persistence.*;

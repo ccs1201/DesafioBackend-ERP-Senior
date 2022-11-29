@@ -23,7 +23,7 @@ public class RootEntryPointControllerV1 {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Root Entrypoint", description = "Fornece o link de todos os recursos da API (Implementação de HyperMedia/HATEAOS)")
+    @Operation(summary = "Root Entrypoint", description = "Fornece o link de todos os Entry Points da API (Implementação de HyperMedia/HATEAOS)")
     protected CompletableFuture<RootEntryPointModelV1> getRootEntrypoint() {
 
         return supplyAsync(() -> {

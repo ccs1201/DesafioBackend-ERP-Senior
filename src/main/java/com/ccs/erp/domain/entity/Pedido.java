@@ -1,7 +1,7 @@
 package com.ccs.erp.domain.entity;
 
+import com.ccs.erp.core.exception.DescontoException;
 import com.ccs.erp.domain.desconto.Desconto;
-import com.ccs.erp.infrastructure.exception.DescontoException;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;

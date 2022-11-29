@@ -15,9 +15,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, UUID> {
 
     final String FIND_ALL_QUERY = """
             select p from Pedido p 
-            join fetch p.itensPedido ip 
-            join fetch ip.item  
-            order by p.dataPedido
+            join fetch p.itensPedido itensPedido 
+            join fetch itensPedido.item item
             """;
 
     final String COUNT_QUERY = """
@@ -26,14 +25,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, UUID> {
 
     final String FIND_BY_ID_QUERY = """
             select p from Pedido p 
-            left join fetch p.itensPedido ip 
-            left join fetch ip.item 
+            left join fetch p.itensPedido itensPedido 
+            left join fetch itensPedido.item item
             where p.id= :uuid 
-            order by p.dataPedido
             """;
 
     @Query(value = FIND_ALL_QUERY,
-            countQuery= COUNT_QUERY)
+            countQuery = COUNT_QUERY)
     Page<Pedido> findAll(Pageable pageable);
 
     @Override

@@ -1,11 +1,14 @@
 package com.ccs.erp.domain.service;
 
+import com.ccs.erp.core.exception.ItemNaoEncontradoException;
+import com.ccs.erp.core.exception.PedidoException;
+import com.ccs.erp.core.exception.PedidoNaoEncontradoException;
+import com.ccs.erp.core.exception.RepositoryEntityPersistException;
+import com.ccs.erp.domain.desconto.DescontoItem;
+import com.ccs.erp.domain.desconto.DescontoSomenteProduto;
+import com.ccs.erp.domain.desconto.DescontoSomenteServico;
 import com.ccs.erp.domain.entity.Pedido;
 import com.ccs.erp.domain.repository.PedidoRepository;
-import com.ccs.erp.infrastructure.exception.ItemNaoEncontradoException;
-import com.ccs.erp.infrastructure.exception.PedidoException;
-import com.ccs.erp.infrastructure.exception.PedidoNaoEncontradoException;
-import com.ccs.erp.infrastructure.exception.RepositoryEntityPersistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -55,7 +58,7 @@ public class PedidoService {
 
     @Transactional
     public void deleteById(UUID id) {
-        var pedido = this.findById(id);
+        var pedido = repository.getReferenceById(id);
         repository.delete(pedido);
     }
 
@@ -135,5 +138,30 @@ public class PedidoService {
         } catch (ItemNaoEncontradoException e) {
             throw new PedidoException(e.getMessage());
         }
+    }
+
+    public Pedido aplicarDescontoTodosItens(UUID id, int percentual) {
+        var pedido = this.findById(id);
+
+        pedido.aplicarDesconto(percentual, new DescontoItem());
+
+        return this.save(pedido);
+    }
+
+    public Pedido aplicarDescontoSomenteProduto(UUID id, Integer percentual) {
+
+        var pedido = this.findById(id);
+
+        pedido.aplicarDesconto(percentual, new DescontoSomenteProduto());
+
+        return this.save(pedido);
+    }
+
+    public Pedido aplicarDescontoSomenteServico(UUID id, Integer percentual) {
+        var pedido = this.findById(id);
+
+        pedido.aplicarDesconto(percentual, new DescontoSomenteServico());
+
+        return this.save(pedido);
     }
 }

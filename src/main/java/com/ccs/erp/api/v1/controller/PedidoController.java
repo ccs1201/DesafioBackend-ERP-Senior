@@ -3,17 +3,17 @@ package com.ccs.erp.api.v1.controller;
 import com.ccs.erp.api.model.input.PedidoInput;
 import com.ccs.erp.api.model.response.PedidoResponse;
 import com.ccs.erp.api.v1.controller.documentation.PedidoControllerDoc;
+import com.ccs.erp.core.utils.mapper.PedidoMapper;
 import com.ccs.erp.domain.service.PedidoService;
-import com.ccs.erp.infrastructure.utils.mapper.PedidoMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -36,10 +36,14 @@ public class PedidoController implements PedidoControllerDoc {
     @Override
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<Page<PedidoResponse>> getAll(@Nullable @PageableDefault(size = 5) Pageable pageable) {
+    public CompletableFuture<Page<PedidoResponse>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "dataPedido") String sort,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction) {
 
         return supplyAsync(() ->
-                service.findAll(pageable), ForkJoinPool.commonPool())
+                service.findAll(PageRequest.of(page, size, direction, sort)), ForkJoinPool.commonPool())
                 .thenApply(mapper::toPage);
     }
 
@@ -54,7 +58,7 @@ public class PedidoController implements PedidoControllerDoc {
 
     @Override
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<PedidoResponse> cadastrarNovoPedido(@RequestBody @Valid PedidoInput pedidoInput) {
         return supplyAsync(() ->
                 service.CadastrarNovoPedido(mapper.toEntity(pedidoInput)), ForkJoinPool.commonPool())
@@ -64,7 +68,7 @@ public class PedidoController implements PedidoControllerDoc {
     @Override
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> excluir(@PathVariable UUID id) {
         runAsync(() ->
                 service.deleteById(id), ForkJoinPool.commonPool()
         );
@@ -74,7 +78,7 @@ public class PedidoController implements PedidoControllerDoc {
     @Override
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<PedidoResponse> update(@RequestBody @Valid PedidoInput pedidoInput, @PathVariable UUID id) {
+    public CompletableFuture<PedidoResponse> atualizar(@RequestBody @Valid PedidoInput pedidoInput, @PathVariable UUID id) {
         return supplyAsync(() ->
                 service.update(id, mapper.toEntity(pedidoInput)), ForkJoinPool.commonPool())
                 .thenApply(mapper::toModel);
@@ -83,7 +87,7 @@ public class PedidoController implements PedidoControllerDoc {
     @Override
     @PatchMapping("/{id}/aberto")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public CompletableFuture<Void> aberto(@PathVariable UUID id) {
+    public CompletableFuture<Void> abrir(@PathVariable UUID id) {
 
         runAsync(() ->
                 service.abrirPedido(id), ForkJoinPool.commonPool()
@@ -94,10 +98,36 @@ public class PedidoController implements PedidoControllerDoc {
     @Override
     @PatchMapping("/{id}/fechado")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public CompletableFuture<Void> fechado(@PathVariable UUID id) {
+    public CompletableFuture<Void> fechar(@PathVariable UUID id) {
         runAsync(() ->
                 service.fecharPedido(id), ForkJoinPool.commonPool()
         );
         return null;
+    }
+
+    @PatchMapping("/{id}/descontoItens")
+    @ResponseStatus(HttpStatus.OK)
+    @Override
+    public CompletableFuture<PedidoResponse> aplicarDescontoTodosItens(@PathVariable UUID id, @RequestParam @NonNull Integer percentual) {
+        return supplyAsync(() ->
+                service.aplicarDescontoTodosItens(id, percentual), ForkJoinPool.commonPool())
+                .thenApply(mapper::toModel);
+    }
+
+    @PatchMapping("/{id}/descontoProduto")
+    @ResponseStatus(HttpStatus.OK)
+    @Override
+    public CompletableFuture<PedidoResponse> aplicarDescontoSomenteProduto(@PathVariable UUID id, @RequestParam @NonNull Integer percentual) {
+        return supplyAsync(()->
+                service.aplicarDescontoSomenteProduto(id,percentual), ForkJoinPool.commonPool())
+                .thenApply(mapper::toModel);
+    }
+
+    @PatchMapping("/{id}/descontoServico")
+    @Override
+    public CompletableFuture<PedidoResponse> aplicarDescontoSomenteServico(@PathVariable UUID id, @RequestParam @NonNull Integer percentual) {
+        return supplyAsync(()->
+                service.aplicarDescontoSomenteServico(id,percentual))
+                .thenApply(mapper::toModel);
     }
 }

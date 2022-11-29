@@ -1,7 +1,7 @@
 package com.ccs.erp.domain.desconto;
 
+import com.ccs.erp.core.exception.DescontoPercentualNaoPermitidoException;
 import com.ccs.erp.domain.entity.ItemPedido;
-import com.ccs.erp.infrastructure.exception.DescontoPercentualNaoPermitidoException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

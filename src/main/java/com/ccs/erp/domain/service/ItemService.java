@@ -1,12 +1,12 @@
 package com.ccs.erp.domain.service;
 
+import com.ccs.erp.core.exception.ItemJaCadastradoException;
+import com.ccs.erp.core.exception.ItemNaoEncontradoException;
+import com.ccs.erp.core.exception.RepositoryEntityInUseException;
+import com.ccs.erp.core.exception.RepositoryEntityPersistException;
 import com.ccs.erp.domain.entity.Item;
 import com.ccs.erp.domain.entity.TipoItem;
 import com.ccs.erp.domain.repository.ItemRepository;
-import com.ccs.erp.infrastructure.exception.ItemJaCadastradoException;
-import com.ccs.erp.infrastructure.exception.ItemNaoEncontradoException;
-import com.ccs.erp.infrastructure.exception.RepositoryEntityInUseException;
-import com.ccs.erp.infrastructure.exception.RepositoryEntityPersistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -51,12 +51,12 @@ public class ItemService {
     @Transactional
     public void deleteById(UUID uuid) {
         var item = this.findById(uuid);
-    try {
-        repository.delete(item);
-    } catch (DataIntegrityViolationException e){
-        throw new RepositoryEntityInUseException("Não é possível remover o item código: "+ uuid, e);
+        try {
+            repository.delete(item);
+        } catch (DataIntegrityViolationException e) {
+            throw new RepositoryEntityInUseException("Não é possível remover o item código: " + uuid, e);
 
-    }
+        }
 
     }
 
@@ -90,5 +90,16 @@ public class ItemService {
     public Item cadastrarServico(Item item) {
         item.setTipoItem(TipoItem.SERVICO);
         return this.save(item);
+    }
+
+    public Page<Item> findBy(Pageable pageable, String nome, TipoItem tipoItem, Boolean ativo) {
+
+        var itens =  repository.findBy(pageable, nome, tipoItem, ativo);
+
+        if(itens.isEmpty()){
+            throw new ItemNaoEncontradoException("Nenhum registro encontro para os parâmetros informados");
+        }
+
+        return itens;
     }
 }

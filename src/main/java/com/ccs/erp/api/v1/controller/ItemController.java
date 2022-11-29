@@ -3,12 +3,13 @@ package com.ccs.erp.api.v1.controller;
 import com.ccs.erp.api.model.input.ItemInput;
 import com.ccs.erp.api.model.response.ItemResponse;
 import com.ccs.erp.api.v1.controller.documentation.ItemControllerDoc;
+import com.ccs.erp.core.utils.mapper.ItemMapper;
+import com.ccs.erp.domain.entity.TipoItem;
 import com.ccs.erp.domain.service.ItemService;
-import com.ccs.erp.infrastructure.utils.mapper.ItemMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
@@ -33,12 +34,12 @@ public class ItemController implements ItemControllerDoc {
     @Override
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<Page<ItemResponse>> getAll(@Nullable @PageableDefault Pageable pageable) {
-
-        return supplyAsync(() ->
-                        service.findAll(pageable),
-                ForkJoinPool.commonPool())
-                .thenApply(mapper::toPage);
+    public CompletableFuture<Page<ItemResponse>> getAll(@RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "5") int size,
+                                                        @RequestParam(defaultValue = "nome") String sort,
+                                                        @RequestParam(defaultValue = "ASC") Sort.Direction direction) {
+        return supplyAsync(() -> service.findAll(PageRequest.of(page, size, direction, sort)),
+                ForkJoinPool.commonPool()).thenApply(mapper::toPage);
     }
 
     @Override
@@ -46,52 +47,41 @@ public class ItemController implements ItemControllerDoc {
     @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<ItemResponse> getById(@PathVariable UUID id) {
 
-        return supplyAsync((() ->
-                        service.findById(id)),
-                ForkJoinPool.commonPool())
-                .thenApply(mapper::toModel);
+        return supplyAsync((() -> service.findById(id)), ForkJoinPool.commonPool()).thenApply(mapper::toModel);
     }
 
     @Override
     @PostMapping("/servico")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<ItemResponse> cadastrarServico(@RequestBody @Valid ItemInput itemInput) {
 
-        return supplyAsync(() ->
-                        service.cadastrarServico(mapper.toEntity(itemInput)),
-                ForkJoinPool.commonPool())
-                .thenApply(mapper::toModel);
+        return supplyAsync(() -> service.cadastrarServico(mapper.toEntity(itemInput)), ForkJoinPool.commonPool()).thenApply(mapper::toModel);
     }
 
     @PostMapping("/produto")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<ItemResponse> cadastrarProduto(@RequestBody @Valid ItemInput itemInput) {
         return supplyAsync(() ->
-                        service.cadastrarProduto(mapper.toEntity(itemInput))
-                , ForkJoinPool.commonPool())
-                .thenApply(mapper::toModel);
+                service.cadastrarProduto(mapper.toEntity(itemInput)),
+                ForkJoinPool.commonPool()).thenApply(mapper::toModel);
     }
 
     @Override
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public CompletableFuture<Void> delete(@PathVariable UUID id) {
+    public CompletableFuture<Void> excluir(@PathVariable UUID id) {
 
         return runAsync(() ->
-                        service.deleteById(id)
-                , ForkJoinPool.commonPool());
+                service.deleteById(id), ForkJoinPool.commonPool());
     }
 
     @Override
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<ItemResponse> update(@RequestBody @Valid ItemInput itemInput,
-                                                  @PathVariable UUID id) {
+    public CompletableFuture<ItemResponse> atualizar(@RequestBody @Valid ItemInput itemInput, @PathVariable UUID id) {
         return supplyAsync(() ->
-                        service.update(
-                                mapper.toEntity(itemInput), id),
-                ForkJoinPool.commonPool())
-                .thenApply(mapper::toModel);
+                service.update(mapper.toEntity(itemInput), id),
+                ForkJoinPool.commonPool()).thenApply(mapper::toModel);
     }
 
     @Override
@@ -99,21 +89,35 @@ public class ItemController implements ItemControllerDoc {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public CompletableFuture<Void> ativar(@PathVariable UUID id) {
         runAsync(() ->
-                        service.ativar(id),
-                ForkJoinPool.commonPool()
-        );
+                service.ativar(id), ForkJoinPool.commonPool());
 
         return null;
     }
 
     @Override
     @PatchMapping("/{id}/inativo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public CompletableFuture<Void> inativar(@PathVariable UUID id) {
 
         runAsync(() ->
-                        service.inativar(id),
-                ForkJoinPool.commonPool()
-        );
+                service.inativar(id), ForkJoinPool.commonPool());
         return null;
+    }
+
+
+    @Override
+    @GetMapping("/filtro")
+    @ResponseStatus(HttpStatus.OK)
+    public CompletableFuture<Page<ItemResponse>> filtrar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "nome") String sort,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+            @Nullable String nome,
+            @Nullable TipoItem tipo,
+            @Nullable Boolean ativo) {
+        return supplyAsync(() ->
+                service.findBy(PageRequest.of(page, size, direction, sort), nome, tipo, ativo))
+                .thenApply(mapper::toPage);
     }
 }
