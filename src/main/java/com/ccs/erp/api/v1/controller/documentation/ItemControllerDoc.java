@@ -2,11 +2,14 @@ package com.ccs.erp.api.v1.controller.documentation;
 
 import com.ccs.erp.api.model.input.ItemInput;
 import com.ccs.erp.api.model.response.ItemResponse;
+import com.ccs.erp.core.exceptionhandler.model.ApiExceptionResponse;
 import com.ccs.erp.domain.entity.TipoItem;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
@@ -43,7 +46,9 @@ public interface ItemControllerDoc {
 
     @Operation(summary = "Excluir", description = "Excluí um item somente se ele não estiver a associado a um pedido")
     @Parameter(name = "id", description = "ID do item a ser removido", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    @ApiResponse(responseCode = "409", description = "Se o item não puder ser excluido")
+    @ApiResponse(responseCode = "409", description = "Se o item não puder ser excluido",
+            content = @Content(
+                    schema = @Schema(implementation = ApiExceptionResponse.class)))
     CompletableFuture<Void> excluir(UUID id);
 
     @Operation(summary = "Atualizar", description = "Atualiza um Item.")
