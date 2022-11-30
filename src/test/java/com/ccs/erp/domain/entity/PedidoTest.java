@@ -1,29 +1,25 @@
 package com.ccs.erp.domain.entity;
 
 import com.ccs.erp.core.exception.DescontoException;
-import com.ccs.erp.core.exception.DescontoPercentualNaoPermitidoException;
-import com.ccs.erp.domain.desconto.DescontoItem;
-import com.ccs.erp.domain.desconto.DescontoSomenteProduto;
-import com.ccs.erp.domain.desconto.DescontoSomenteServico;
+import com.ccs.erp.domain.factory.ItemFactory;
+import com.ccs.erp.domain.factory.ItemPedidoFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PedidoTest {
-
     private static final int PERCENTUAL_DESCONTO_ZERO = 0;
     private static final int PERCENTUAL_DESCONTO_NEGATIVO = -1;
     private static final int PERCENTUAL_DESCONTO_MAIOR_MAXIMO = 101;
     private static final int PERCENTUAL_DESCONTO_CEM = 100;
     private final int PERCENTUAL_DESCONTO_DEZ = 10;
-    private final BigDecimal VALOR_ITEM = BigDecimal.valueOf(100);
-    private final int QTD = 10;
     private Item itemProduto;
     private Item itemServico;
     private ItemPedido itemPedidoProduto;
@@ -33,42 +29,26 @@ class PedidoTest {
     @BeforeEach
     void setup() {
 
-        this.itemProduto = Item.builder()
-                .tipoItem(TipoItem.PRODUTO)
-                .valor(VALOR_ITEM)
-                .ativo(true)
-                .nome("Item Produto")
-                .build();
+        this.itemProduto = ItemFactory.buildItemProduto();
 
-        this.itemServico = Item.builder()
-                .tipoItem(TipoItem.SERVICO)
-                .valor(VALOR_ITEM)
-                .ativo(true)
-                .nome("Item Serviço")
-                .build();
+        this.itemServico = ItemFactory.buildItemServico();
 
-        this.itemPedidoProduto = ItemPedido.builder()
-                .item(itemProduto)
-//                .valorDesconto(BigDecimal.ZERO)
-                .quantidade(QTD)
-                .build();
+        this.itemPedidoProduto = ItemPedidoFactory.apenasProduto();
 
-        this.itemPedidoServico = ItemPedido.builder()
-                .item(itemServico)
-//                .valorDesconto(BigDecimal.ZERO)
-                .quantidade(QTD)
-                .build();
+        this.itemPedidoServico = ItemPedidoFactory.apenasServico();
+
 
         this.pedido = Pedido.builder()
                 .observacao("Teste TESTE Teste")
-                .itensPedido(new ArrayList<>())
-//                .valorTotalDesconto(BigDecimal.ZERO)
-//                .valorTotalPedido(BigDecimal.ZERO)
-//                .valorTotalItens(BigDecimal.ZERO)
+                .valorTotalDesconto(BigDecimal.ZERO)
+                .valorTotalPedido(BigDecimal.ZERO)
+                .valorTotalItens(BigDecimal.ZERO)
                 .statusPedido(StatusPedido.ABERTO)
+                .itensPedido(new ArrayList<>())
                 .build();
-        this.pedido.addItemPedido(itemPedidoProduto);
-        this.pedido.addItemPedido(itemPedidoServico);
+
+        pedido.getItensPedido().add(itemPedidoServico);
+        pedido.getItensPedido().add(itemPedidoProduto);
 
     }
 
@@ -77,53 +57,32 @@ class PedidoTest {
     void testaTotalPedidoSemDesconto() {
         var totalPedidoExpected = BigDecimal.valueOf(2000).setScale(2);
 
-        pedido.calcularTotaisPedido();
-
-//        assertTrue(totalPedidoExpected.compareTo(pedido.getValorTotalPedido()) == 0);
         assertEquals(totalPedidoExpected, pedido.getValorTotalPedido());
     }
 
     @Test
     @DisplayName("Testa total pedido com desconto")
     void testaTotalPedidoComDesconto() {
-        var totalExpected = BigDecimal.valueOf(1800).setScale(2);
+        //Garante q o valor total esteja calculado.
+        pedido.getValorTotalPedido();
 
-        var desconto = new DescontoItem();
+        var totalExpected = BigDecimal.valueOf(1900).setScale(2);
 
-        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ, desconto);
-
-        pedido.calcularTotaisPedido();
+        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ);
 
         assertEquals(totalExpected, pedido.getValorTotalPedido());
     }
 
     @Test
-    @DisplayName("Testa desconto em todos o itens")
-    void testaDescontoTodos() {
-
-        var totalDescontoExpected = BigDecimal.valueOf(200).setScale(2);
-
-        var desconto = new DescontoItem();
-
-        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ, desconto);
-        pedido.calcularTotaisPedido();
-
-        assertEquals(totalDescontoExpected, pedido.getValorTotalDesconto());
-    }
-
-
-    @Test
     @DisplayName("Testa desconto 100 por cento")
     void testaDescontoCem() {
 
-        var totalDescontoExpected = BigDecimal.valueOf(2000).setScale(2);
+        var totalDescontoExpected = BigDecimal.valueOf(1000).setScale(2);
 
-        var desconto = new DescontoItem();
-
-        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_CEM, desconto);
-        pedido.calcularTotaisPedido();
+        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_CEM);
 
         assertEquals(totalDescontoExpected, pedido.getValorTotalDesconto());
+
     }
 
 
@@ -132,24 +91,7 @@ class PedidoTest {
     void testaDescontoProduto() {
         var totalDescontoExpected = BigDecimal.valueOf(100).setScale(2);
 
-        var desconto = new DescontoSomenteProduto();
-
-        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ, desconto);
-        pedido.calcularTotaisPedido();
-
-        assertEquals(totalDescontoExpected, pedido.getValorTotalDesconto());
-
-    }
-
-    @Test
-    @DisplayName("Testa Desconto Servico")
-    void testaDescontoServico() {
-        var totalDescontoExpected = BigDecimal.valueOf(100).setScale(2);
-
-        var desconto = new DescontoSomenteServico();
-
-        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ, desconto);
-        pedido.calcularTotaisPedido();
+        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ);
 
         assertEquals(totalDescontoExpected, pedido.getValorTotalDesconto());
 
@@ -159,33 +101,24 @@ class PedidoTest {
     @DisplayName("Testa Desconto ZERO por cento")
     void testaDescontoZero() {
 
-        var desconto = new DescontoItem();
-        pedido.calcularTotaisPedido();
-
-        assertThrows(DescontoPercentualNaoPermitidoException.class,
-                () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_ZERO, desconto));
+        assertThrows(DescontoException.class,
+                () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_ZERO));
     }
 
     @Test
     @DisplayName("Testa Desconto Negativo")
     void testaDescontoNegativo() {
 
-        var desconto = new DescontoItem();
-        pedido.calcularTotaisPedido();
-
-        assertThrows(DescontoPercentualNaoPermitidoException.class,
-                () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_NEGATIVO, desconto));
+        assertThrows(DescontoException.class,
+                () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_NEGATIVO));
     }
 
     @Test
     @DisplayName("Testa Desconto Maior que 100")
     void testaDescontoMaioRQueCem() {
 
-        var desconto = new DescontoItem();
-        pedido.calcularTotaisPedido();
-
-        assertThrows(DescontoPercentualNaoPermitidoException.class,
-                () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_MAIOR_MAXIMO, desconto));
+        assertThrows(DescontoException.class,
+                () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_MAIOR_MAXIMO));
     }
 
     @Test
@@ -193,19 +126,17 @@ class PedidoTest {
     void testaValorTotalItensSemDesconto() {
         var totalItensExpected = BigDecimal.valueOf(2000).setScale(2);
 
-        pedido.calcularTotaisPedido();
         assertEquals(totalItensExpected, pedido.getValorTotalItens());
     }
 
     @Test
     @DisplayName("Testa valor total itens com desconto")
     void testaValorTotalItensComDesconto() {
+        pedido.getValorTotalItens();
+
         var totalItensExpected = BigDecimal.valueOf(2000).setScale(2);
 
-        var desconto = new DescontoItem();
-
-        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ, desconto);
-        pedido.calcularTotaisPedido();
+        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ);
 
         assertEquals(totalItensExpected, pedido.getValorTotalItens());
     }
@@ -213,11 +144,48 @@ class PedidoTest {
     @Test
     @DisplayName("Testa aplicar desconto com pedido fechado")
     void testaAplicarDescontoPedidoFechado() {
-        pedido.setStatusPedido(StatusPedido.FECHADO);
+        pedido.fechar();
 
         assertThrows(DescontoException.class,
                 () ->
-                        pedido.aplicarDesconto(1, new DescontoItem()));
+                        pedido.aplicarDesconto(1));
+    }
+
+
+    @Test
+    @DisplayName("Testa aplicar desconto em item servico")
+    void aplicarDescontoServico() {
+        var pedido = Pedido.builder()
+                .observacao("Teste TESTE Teste")
+                .valorTotalDesconto(BigDecimal.ZERO)
+                .valorTotalPedido(BigDecimal.ZERO)
+                .valorTotalItens(BigDecimal.ZERO)
+                .statusPedido(StatusPedido.ABERTO)
+                .itensPedido(new LinkedList<>())
+                .build();
+        pedido.addItemPedido(itemPedidoServico);
+
+        var totalExpected = BigDecimal.valueOf(1000).setScale(2);
+
+        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ);
+
+        assertEquals(totalExpected, pedido.getValorTotalPedido());
+
+    }
+
+    @Test
+    @DisplayName("Testa Aplicar Desconto duas vezes")
+    void testaAplicarDescontoDuasVezes() {
+
+        var segundoResultado = BigDecimal.valueOf(1000).setScale(2);
+        pedido.getValorTotalPedido();
+
+        pedido.aplicarDesconto(PERCENTUAL_DESCONTO_DEZ);
+
+        pedido.aplicarDesconto(100);
+
+        assertEquals(segundoResultado, pedido.getValorTotalPedido());
+
     }
 
 }

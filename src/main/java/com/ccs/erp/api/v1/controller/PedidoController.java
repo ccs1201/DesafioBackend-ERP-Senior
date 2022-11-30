@@ -60,8 +60,15 @@ public class PedidoController implements PedidoControllerDoc {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<PedidoResponse> cadastrarNovoPedido(@RequestBody @Valid PedidoInput pedidoInput) {
-        return supplyAsync(() ->
-                service.CadastrarNovoPedido(mapper.toEntity(pedidoInput)), ForkJoinPool.commonPool())
+        return supplyAsync(() -> {
+
+            var pedido = mapper.toEntity(pedidoInput);
+
+            pedido = service.CadastrarNovoPedido(pedido);
+
+            return pedido;
+
+        }, ForkJoinPool.commonPool())
                 .thenApply(mapper::toModel);
     }
 
@@ -88,7 +95,6 @@ public class PedidoController implements PedidoControllerDoc {
     @PatchMapping("/{id}/aberto")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public CompletableFuture<Void> abrir(@PathVariable UUID id) {
-
         runAsync(() ->
                 service.abrirPedido(id), ForkJoinPool.commonPool()
         );
@@ -105,29 +111,13 @@ public class PedidoController implements PedidoControllerDoc {
         return null;
     }
 
-    @PatchMapping("/{id}/descontoItens")
-    @ResponseStatus(HttpStatus.OK)
-    @Override
-    public CompletableFuture<PedidoResponse> aplicarDescontoTodosItens(@PathVariable UUID id, @RequestParam @NonNull Integer percentual) {
-        return supplyAsync(() ->
-                service.aplicarDescontoTodosItens(id, percentual), ForkJoinPool.commonPool())
-                .thenApply(mapper::toModel);
-    }
 
     @PatchMapping("/{id}/descontoProduto")
     @ResponseStatus(HttpStatus.OK)
     @Override
     public CompletableFuture<PedidoResponse> aplicarDescontoSomenteProduto(@PathVariable UUID id, @RequestParam @NonNull Integer percentual) {
-        return supplyAsync(()->
-                service.aplicarDescontoSomenteProduto(id,percentual), ForkJoinPool.commonPool())
-                .thenApply(mapper::toModel);
-    }
-
-    @PatchMapping("/{id}/descontoServico")
-    @Override
-    public CompletableFuture<PedidoResponse> aplicarDescontoSomenteServico(@PathVariable UUID id, @RequestParam @NonNull Integer percentual) {
-        return supplyAsync(()->
-                service.aplicarDescontoSomenteServico(id,percentual))
+        return supplyAsync(() ->
+                service.aplicarDescontoSomenteProduto(id, percentual), ForkJoinPool.commonPool())
                 .thenApply(mapper::toModel);
     }
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -42,6 +43,7 @@ public interface ItemControllerDoc {
 
     @Operation(summary = "Excluir", description = "Excluí um item somente se ele não estiver a associado a um pedido")
     @Parameter(name = "id", description = "ID do item a ser removido", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    @ApiResponse(responseCode = "409", description = "Se o item não puder ser excluido")
     CompletableFuture<Void> excluir(UUID id);
 
     @Operation(summary = "Atualizar", description = "Atualiza um Item.")

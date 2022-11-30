@@ -1,30 +1,28 @@
 package com.ccs.erp.domain.entity;
 
 import com.ccs.erp.core.exception.DescontoException;
-import com.ccs.erp.domain.desconto.Desconto;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @DynamicUpdate
+@AllArgsConstructor
+@NoArgsConstructor
 public class Pedido {
 
     @Id
@@ -33,15 +31,14 @@ public class Pedido {
     @Column(name = "id", nullable = false)
     private UUID id;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pedido", cascade = CascadeType.ALL)
-    private Collection<ItemPedido> itensPedido = new LinkedList<>();
-
+    private Collection<ItemPedido> itensPedido;
     @Column(nullable = false)
     @PositiveOrZero
-    private BigDecimal valorTotalItens;
+    private BigDecimal valorTotalItens = BigDecimal.ZERO;
     @PositiveOrZero
-    private BigDecimal valorTotalDesconto;
-    @Positive
-    private BigDecimal valorTotalPedido;
+    private BigDecimal valorTotalDesconto = BigDecimal.ZERO;
+    @PositiveOrZero
+    private BigDecimal valorTotalPedido = BigDecimal.ZERO;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusPedido statusPedido;
@@ -57,32 +54,104 @@ public class Pedido {
     @UpdateTimestamp
     private OffsetDateTime ultimaAtualizacao;
 
+
+    public BigDecimal getValorTotalPedido() {
+        if (valorTotalPedido.equals(BigDecimal.ZERO)) {
+            this.calcularTotais();
+        }
+        return valorTotalPedido;
+    }
+
+    public BigDecimal getValorTotalItens() {
+        if (valorTotalItens.equals(BigDecimal.ZERO)) {
+            this.calcularTotais();
+        }
+        return valorTotalItens;
+    }
+
     /**
-     * <p>Adiciona um item ao Pedido</p>
+     * <p>Adiciona um {@link ItemPedido} ao pedido.</p>
      *
      * @param itemPedido Item a ser adicionado.
      */
     public void addItemPedido(ItemPedido itemPedido) {
-        itemPedido.setPedido(this);
-        itensPedido.add(itemPedido);
+        if (itensPedido == null) {
+            itensPedido = new ArrayList<>();
+        }
+        this.itensPedido.add(itemPedido);
     }
 
-    /**
-     * <p>Aplica um desconto percentual aos Itens do Pedido</p>
-     * <br>
-     *
-     * @param percentualDesconto Inteiro que representa o desconto a ser aplicado.
-     * @param desconto           Interface que represent ao tipo de desconto a ser aplicado.
-     */
-    public void aplicarDesconto(int percentualDesconto, Desconto desconto) {
+
+    public void aplicarDesconto(int percentualDesconto) {
 
         this.podeAplicarDesconto();
+        this.validarLimiteDesconto(percentualDesconto);
+
+        //Garante que o desconto esteja zerado para evitar o acumulo
+        //qdo o desconto for aplicado várias vezes
+        this.valorTotalDesconto = BigDecimal.ZERO;
 
         this.percentualDesconto = percentualDesconto;
 
-        itensPedido.forEach((itemPedido ->
-                desconto.aplicarDesconto(percentualDesconto, itemPedido)
-        ));
+        this.itensPedido.forEach(itemPedido -> {
+            if (itemPedido.getItem().getTipoItem() == TipoItem.PRODUTO) {
+                this.calcularDesconto(itemPedido);
+            }
+        });
+    }
+
+    private void calcularDesconto(ItemPedido itemPedido) {
+
+        //Percentual do desconto em decimal.
+        // Ex. 10/100 = 0,1
+        var descontoDecimal = descontoToDecimal();
+
+        //Calcula o desconto unitário.
+        //Ex. 100*0,1 = 10
+        var vlrDescontoUnitario = itemPedido.getValorUnitario().multiply(descontoDecimal).setScale(2, RoundingMode.HALF_UP);
+
+        //Calcula o desconto total do item.
+        //Ex. 10*5 = 50
+        var vlrDescontoTotalItem = vlrDescontoUnitario.multiply(BigDecimal.valueOf(itemPedido.getQuantidade()).setScale(2, RoundingMode.HALF_UP));
+
+
+        this.atualizarValorTotalDesconto(vlrDescontoTotalItem);
+
+        this.atualizarValorTotalPedido();
+    }
+
+    /**
+     * <p>Atualiza o valor total do pedido subtraindo
+     * do {@code valorTotalItens} o valor de
+     * {@code valorTotalDesconto}</p>
+     * <br>
+     * <p> {@code valorTotalItens} - {@code valorTotalDesconto}</p>
+     */
+    private void atualizarValorTotalPedido() {
+        valorTotalPedido = valorTotalItens.subtract(valorTotalDesconto).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Atualiza o {@code valorTotalDesconto}
+     *
+     * @param vlrDescontoTotalItem
+     */
+    private void atualizarValorTotalDesconto(BigDecimal vlrDescontoTotalItem) {
+        valorTotalDesconto = valorTotalDesconto.add(vlrDescontoTotalItem).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal descontoToDecimal() {
+
+        float percentualDecimal = percentualDesconto / 100F;
+
+        return BigDecimal.valueOf(percentualDecimal).setScale(3, RoundingMode.HALF_UP);
+    }
+
+    private void validarLimiteDesconto(int percentualDesconto) {
+
+        if (percentualDesconto < 1 || percentualDesconto > 100) {
+            throw new DescontoException("Percentual de Desconto não permito, informe um valor entre 1 e 100.");
+        }
     }
 
     /**
@@ -101,70 +170,34 @@ public class Pedido {
     }
 
     /**
-     * <p>Calcula os totais para {@code valorTotalPedido}, {@code valorTotalItens} e
-     * {@code valorTotalDesconto} antes de persistir no banco</p>
+     * <p>Calcula os totais para {@code valorTotalPedido}, {@code valorTotalItens} </p>
      */
-    @PrePersist
-    public void calcularTotaisPedido() {
+    public void calcularTotais() {
 
-        valorTotalDesconto = BigDecimal.ZERO;
         valorTotalItens = BigDecimal.ZERO;
         valorTotalPedido = BigDecimal.ZERO;
 
-        itensPedido.forEach(itemPedido -> {
-            //Acumula o total do Pedido
-            adicionaValorTotalItensPedido(itemPedido);
-
-            if(percentualDesconto > 0){
-                //Acumula o Total Desconto
-                adicionaDescontoItem(itemPedido);
-            }
-
-        });
+        //Soma o total dos itens
+        itensPedido.forEach((itemPedido -> {
+            itemPedido.setPedido(this);
+            valorTotalItens = valorTotalItens.add(itemPedido.getValorTotalItem());
+        }));
 
         //calcula o valor do pedido
-        calcularValorTotalPedido();
+        atualizarValorTotalPedido();
     }
 
     /**
-     * <p>Calculo o valor total do pedido</p>
-     * <br>
-     * <p> {@code valorTotalItens} - {@code valorTotalDesconto}</p>
+     * Seta o {@link StatusPedido} do pedido
+     * como {@code  StatusPedido.FECHADO}
      */
-    private void calcularValorTotalPedido() {
-        valorTotalPedido = valorTotalItens
-                .subtract(valorTotalDesconto)
-                .setScale(2, RoundingMode.HALF_UP);
-    }
-
-    /**
-     * <p>Adiciona o valor total do desconto dos itens
-     * ao {@code valorTotalDesconto} do pedido</p>
-     *
-     * @param itemPedido
-     */
-    private void adicionaDescontoItem(ItemPedido itemPedido) {
-        valorTotalDesconto = valorTotalDesconto
-                .add(itemPedido.getValorDesconto())
-                .setScale(2, RoundingMode.HALF_UP);
-    }
-
-    /**
-     * <p>Adiciona o valor total dos itens
-     * ao {@code valorTotalItens} do pedido</p>
-     *
-     * @param itemPedido
-     */
-    private void adicionaValorTotalItensPedido(ItemPedido itemPedido) {
-        valorTotalItens = valorTotalItens
-                .add(itemPedido.getValorTotalItem())
-                .setScale(2, RoundingMode.HALF_UP);
-    }
-
     public void fechar() {
         statusPedido = StatusPedido.FECHADO;
     }
 
+    /**
+     * Seta o {@link StatusPedido} do pedido como {@code StatusPedido.ABERTO}
+     */
     public void abrir() {
         statusPedido = StatusPedido.ABERTO;
     }

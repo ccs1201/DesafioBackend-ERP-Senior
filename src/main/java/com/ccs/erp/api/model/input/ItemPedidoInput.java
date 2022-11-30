@@ -10,10 +10,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-@JsonRootName("Item Pedido Input")
 @Getter
 @Setter
-@Schema(description = "Modelo de entrada de Item Pedido")
+@Schema(name = "Item Pedido Input",description = "Modelo de entrada de Item Pedido")
 public class ItemPedidoInput {
     @NotNull
     @Valid

@@ -1,12 +1,8 @@
 package com.ccs.erp.domain.service;
 
-import com.ccs.erp.core.exception.ItemNaoEncontradoException;
-import com.ccs.erp.core.exception.PedidoException;
-import com.ccs.erp.core.exception.PedidoNaoEncontradoException;
-import com.ccs.erp.core.exception.RepositoryEntityPersistException;
-import com.ccs.erp.domain.desconto.DescontoItem;
-import com.ccs.erp.domain.desconto.DescontoSomenteProduto;
-import com.ccs.erp.domain.desconto.DescontoSomenteServico;
+import com.ccs.erp.core.exception.*;
+import com.ccs.erp.domain.entity.Item;
+import com.ccs.erp.domain.entity.ItemPedido;
 import com.ccs.erp.domain.entity.Pedido;
 import com.ccs.erp.domain.repository.PedidoRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -28,12 +25,12 @@ public class PedidoService {
     private final PedidoRepository repository;
     private final ItemService itemService;
 
-    @Transactional(readOnly = true)
+
     public Page<Pedido> findAll(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
-    @Transactional(readOnly = true)
+
     public Pedido findById(UUID id) {
         return repository.findById(id).orElseThrow(
                 () -> new PedidoNaoEncontradoException(id));
@@ -47,9 +44,10 @@ public class PedidoService {
      * @param pedido O Pedido a ser salvo no banco.
      * @return {@link Pedido}
      */
+
     private Pedido save(Pedido pedido) {
         try {
-            return repository.save(pedido);
+            return repository.saveAndFlush(pedido);
         } catch (IllegalArgumentException e) {
             log.error("Erro ao salvar pedido", e);
             throw new RepositoryEntityPersistException("Erro ao Salvar Pedido", e);
@@ -75,14 +73,14 @@ public class PedidoService {
     public void fecharPedido(UUID id) {
         var pedido = this.findById(id);
         pedido.fechar();
-        this.save(pedido);
+        repository.saveAndFlush(pedido);
     }
 
     @Transactional
     public void abrirPedido(UUID id) {
         var pedido = this.findById(id);
         pedido.abrir();
-        this.save(pedido);
+        repository.saveAndFlush(pedido);
     }
 
     /**
@@ -101,6 +99,8 @@ public class PedidoService {
         //Busca os Itens que compõem o pedido
         getItens(pedido);
 
+        pedido.calcularTotais();
+
         //Grava no Banco e retorna
         return this.save(pedido);
 
@@ -108,12 +108,14 @@ public class PedidoService {
 
     /**
      * <p>Busca no banco os Itens do pedido e seta
-     * no {@link com.ccs.erp.domain.entity.Item} do <br>
-     * {@link  com.ccs.erp.domain.entity.ItemPedido}</p>
+     * no {@link Item} do <br>
+     * {@link  ItemPedido}</p>
      *
      * @param pedido O pedido que precisa dos itens populados
      */
     private void getItens(Pedido pedido) {
+
+        Set<Item> itensInvalidos = new HashSet<>();
 
         try {
             pedido.getItensPedido().forEach((itemPedido -> {
@@ -123,45 +125,50 @@ public class PedidoService {
                 //O item só pode ser associado a um pedido se estiver ativo
                 if (item.getAtivo()) {
                     itemPedido.setItem(item);
-
-                    //seta o pedido no itemPedido
-                    //para garantir o relacionamento
-                    itemPedido.setPedido(pedido);
-
-                    //seta o valorDesconto como ZERO
-                    //para garantir a integridade do banco
-                    itemPedido.setValorDesconto(BigDecimal.ZERO);
+                    //Se for invalido adiciona no set
+                } else {
+                    itensInvalidos.add(item);
                 }
             }
             ));
 
+            //Agora verificamos se o set contém itens
+            //e lancaçamos uma exception informando os itens inválidos
+            verificaItensInvalido(itensInvalidos);
+
         } catch (ItemNaoEncontradoException e) {
+            log.error("Erro no método getItens em PedidoService", e);
             throw new PedidoException(e.getMessage());
         }
     }
 
-    public Pedido aplicarDescontoTodosItens(UUID id, int percentual) {
-        var pedido = this.findById(id);
+    /**
+     * <p>Verifica se há itens inativos no pedido.</p>
+     *
+     * @param itensInvalidos Set contente os itens inválidos
+     * @throws PedidoException caso haja algum item inativo
+     */
+    private static void verificaItensInvalido(Set<Item> itensInvalidos) {
 
-        pedido.aplicarDesconto(percentual, new DescontoItem());
+        if (!itensInvalidos.isEmpty()) {
+            StringBuilder message = new StringBuilder();
 
-        return this.save(pedido);
+            itensInvalidos.forEach(item ->
+                    message.append(String
+                            .format("O Item %s, está invativo e não pôde ser adicionado ao pedido.", item.getNome())
+                    )
+            );
+            throw new PedidoException(message.toString());
+        }
     }
 
+    @Transactional
     public Pedido aplicarDescontoSomenteProduto(UUID id, Integer percentual) {
 
         var pedido = this.findById(id);
 
-        pedido.aplicarDesconto(percentual, new DescontoSomenteProduto());
+        pedido.aplicarDesconto(percentual);
 
-        return this.save(pedido);
-    }
-
-    public Pedido aplicarDescontoSomenteServico(UUID id, Integer percentual) {
-        var pedido = this.findById(id);
-
-        pedido.aplicarDesconto(percentual, new DescontoSomenteServico());
-
-        return this.save(pedido);
+        return save(pedido);
     }
 }

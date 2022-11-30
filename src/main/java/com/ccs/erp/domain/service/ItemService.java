@@ -51,11 +51,12 @@ public class ItemService {
     @Transactional
     public void deleteById(UUID uuid) {
         var item = this.findById(uuid);
+
         try {
             repository.delete(item);
         } catch (DataIntegrityViolationException e) {
+            log.error("Erro delete Item EXCEPTION", e);
             throw new RepositoryEntityInUseException("Não é possível remover o item código: " + uuid, e);
-
         }
 
     }
@@ -94,9 +95,9 @@ public class ItemService {
 
     public Page<Item> findBy(Pageable pageable, String nome, TipoItem tipoItem, Boolean ativo) {
 
-        var itens =  repository.findBy(pageable, nome, tipoItem, ativo);
+        var itens = repository.findBy(pageable, nome, tipoItem, ativo);
 
-        if(itens.isEmpty()){
+        if (itens.isEmpty()) {
             throw new ItemNaoEncontradoException("Nenhum registro encontro para os parâmetros informados");
         }
 

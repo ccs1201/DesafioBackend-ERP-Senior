@@ -1,11 +1,10 @@
 package com.ccs.erp.domain.entity;
 
-import com.ccs.erp.core.exception.ValorItemNegativoException;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
@@ -16,13 +15,14 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ItemPedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private UUID id;
 
     @ManyToOne
@@ -35,10 +35,6 @@ public class ItemPedido {
     @Column(nullable = false)
     private BigDecimal valorTotalItem;
 
-    @PositiveOrZero
-    @Column(nullable = false)
-    private BigDecimal valorDesconto;
-
     @Positive
     private int quantidade;
 
@@ -47,77 +43,48 @@ public class ItemPedido {
     private Pedido pedido;
 
     /**
-     * <p>Garante que ao setar um item
-     * seu valor seja setado em {@code valorUnitario} </p>
+     * Garante que ao setar um item
+     * seu valor seja setado em {@code valorUnitario}
+     * @param item Item que seja adicionado ao pedido
      */
     public void setItem(Item item) {
         this.item = item;
-        this.valorUnitario = item.getValor();
-    }
-
-    /**
-     * <p>Garante que {@code valorDesconto} seja definido como
-     * ZERO, caso não tenha desconto, para garantir a integridade do banco</p>
-     *
-     * @param valorDesconto
-     */
-    public void setValorDesconto(BigDecimal valorDesconto) {
-        if (valorDesconto == null) {
-            this.valorDesconto = BigDecimal.ZERO;
-        }
-        this.valorDesconto = valorDesconto;
+        valorUnitario = item.getValor();
     }
 
     public BigDecimal getValorUnitario() {
-        if (valorUnitario == null) {
+        /*
+        garante que o valor unitário receba
+        o valor do item
+        */
+        if (this.valorUnitario == null) {
             this.valorUnitario = item.getValor();
         }
         return valorUnitario;
     }
 
     public BigDecimal getValorTotalItem() {
-
-        if (valorUnitario == null) {
-            this.valorUnitario = item.getValor();
+        /*
+        Garante que o valor total do item
+        esteja calculado
+        */
+        if (valorTotalItem == null) {
+            this.calcularTotalItem();
         }
-
-        this.calcularValorTotalItem();
-
-        return this.valorTotalItem;
-    }
-
-    public BigDecimal getValorDesconto() {
-        calcularTotalDesconto();
-
-        return valorDesconto;
+        return valorTotalItem;
     }
 
     /**
-     * <p> Calcula o valor total do item</p>
-     * <br>
-     * <p>{@code valorUnitario} * {@code qtd}</p>
+     * <p>Calcula o valor total do Item</p>
      */
-    private void calcularValorTotalItem() {
+    private void calcularTotalItem() {
 
-        if (valorUnitario.compareTo(BigDecimal.ZERO) != 1) {
-            throw new ValorItemNegativoException("O valor do item não pode ser inferior ou igual a ZERO.");
-        }
+        //chama o get para garantir que o valor unitario seja setado
+        getValorUnitario();
 
-        valorTotalItem = valorUnitario.multiply(BigDecimal.valueOf(quantidade))
-                .setScale(2, RoundingMode.HALF_UP);
+        this.valorTotalItem = valorUnitario.multiply(
+                BigDecimal.valueOf(quantidade)
+        ).setScale(2, RoundingMode.HALF_UP);
 
     }
-
-    /**
-     * <p>Cacula o valor total do desconto</p>
-     * <br>
-     * <p>{@code valorDesconto} * {@code qtd}</p>
-     */
-    private void calcularTotalDesconto() {
-
-        valorDesconto = valorDesconto
-                .multiply(BigDecimal.valueOf(quantidade))
-                .setScale(2, RoundingMode.HALF_UP);
-    }
-
 }

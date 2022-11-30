@@ -77,7 +77,7 @@ public interface PedidoControllerDoc {
             example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", in = ParameterIn.PATH)
     @ApiResponses(value =
             {
-                    @ApiResponse(responseCode = "404", description = "Quando o pedido não existir",
+                    @ApiResponse(responseCode = "404", description = "Quandoroduto o pedido não existir",
                             content = @Content(
                                     schema = @Schema(implementation = ApiExceptionResponse.class))
                     ),
@@ -94,7 +94,7 @@ public interface PedidoControllerDoc {
     @Parameter(name = "id", description = "ID do Pedido a ser aberto",
             example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", in = ParameterIn.PATH)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "404", description = "Quando o pedido não existir",
+            @ApiResponse(responseCode = "404", description = "Quando o pedidoroduto não existir",
                     content = @Content(
                             schema = @Schema(implementation = ApiExceptionResponse.class))),
             @ApiResponse(responseCode = "204", description = "Quando o pedido for aberto com sucesso")
@@ -110,23 +110,6 @@ public interface PedidoControllerDoc {
             @ApiResponse(responseCode = "204", description = "Quando o pedido for fechado com sucesso")
     })
     CompletableFuture<Void> fechar(UUID id);
-
-    @Operation(summary = "Desconto Itens", description = "Aplica o desconto em todos os itens")
-    @Parameters(
-            {
-                    @Parameter(name = "id", description = "ID do pedido que sera aplicado o desconto",
-                            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", in = ParameterIn.PATH),
-                    @Parameter(name = "percentual", description = "Percentual do desconto",
-                            example = "15")
-            })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Se o desconto for aplicado com exito"),
-            @ApiResponse(responseCode = "404", description = "Se o ID do pedido for inválido",
-                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class))),
-            @ApiResponse(responseCode = "422", description = "Se o desconto não puder ser aplicado",
-                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
-    })
-    CompletableFuture<PedidoResponse> aplicarDescontoTodosItens(UUID id, Integer percentual);
 
     @Operation(summary = "Desconto Produtos", description = "Aplica o desconto somente nos produtos")
     @Parameters(
@@ -144,22 +127,5 @@ public interface PedidoControllerDoc {
                     content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
     })
     CompletableFuture<PedidoResponse> aplicarDescontoSomenteProduto(UUID id, Integer percentual);
-
-    @Operation(summary = "Desconto Serviço", description = "Aplica o desconto somente nos serviços")
-    @Parameters(
-            {
-                    @Parameter(name = "id", description = "ID do pedido que sera aplicado o desconto",
-                            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6", in = ParameterIn.PATH),
-                    @Parameter(name = "percentual", description = "Percentual do desconto",
-                            example = "15")
-            })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Se o desconto for aplicado com exito"),
-            @ApiResponse(responseCode = "404", description = "Se o ID do pedido for inválido",
-                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class))),
-            @ApiResponse(responseCode = "422", description = "Se o desconto não puder ser aplicado",
-                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
-    })
-    CompletableFuture<PedidoResponse> aplicarDescontoSomenteServico(UUID id, Integer percentual);
 
 }
