@@ -38,6 +38,7 @@ public class ItemController implements ItemControllerDoc {
                                                         @RequestParam(defaultValue = "5") int size,
                                                         @RequestParam(defaultValue = "nome") String sort,
                                                         @RequestParam(defaultValue = "ASC") Sort.Direction direction) {
+
         return supplyAsync(() -> service.findAll(PageRequest.of(page, size, direction, sort)),
                 ForkJoinPool.commonPool()).thenApply(mapper::toPage);
     }

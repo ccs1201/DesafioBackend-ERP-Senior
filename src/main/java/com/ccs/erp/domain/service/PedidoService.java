@@ -1,6 +1,9 @@
 package com.ccs.erp.domain.service;
 
-import com.ccs.erp.core.exception.*;
+import com.ccs.erp.core.exception.ItemNaoEncontradoException;
+import com.ccs.erp.core.exception.PedidoException;
+import com.ccs.erp.core.exception.PedidoNaoEncontradoException;
+import com.ccs.erp.core.exception.RepositoryEntityPersistException;
 import com.ccs.erp.domain.entity.Item;
 import com.ccs.erp.domain.entity.ItemPedido;
 import com.ccs.erp.domain.entity.Pedido;
@@ -24,6 +27,7 @@ public class PedidoService {
 
     private final PedidoRepository repository;
     private final ItemService itemService;
+    private final ItemPedidoService itemPedidoService;
 
 
     public Page<Pedido> findAll(Pageable pageable) {
@@ -47,6 +51,7 @@ public class PedidoService {
 
     private Pedido save(Pedido pedido) {
         try {
+            pedido.calcularTotais();
             return repository.saveAndFlush(pedido);
         } catch (IllegalArgumentException e) {
             log.error("Erro ao salvar pedido", e);
@@ -98,8 +103,6 @@ public class PedidoService {
 
         //Busca os Itens que compõem o pedido
         getItens(pedido);
-
-        pedido.calcularTotais();
 
         //Grava no Banco e retorna
         return this.save(pedido);
@@ -168,6 +171,38 @@ public class PedidoService {
         var pedido = this.findById(id);
 
         pedido.aplicarDesconto(percentual);
+
+        return save(pedido);
+    }
+
+
+    /**
+     * <p>Adiciona um novo item ao pedido</p>
+     *
+     * @param itemPedido Item a ser adicionado
+     */
+    @Transactional
+    public Pedido adicionarItemPedido(ItemPedido itemPedido, UUID idPedido) {
+
+        var pedido = findById(idPedido);
+        pedido.addItemPedido(itemPedido);
+        return save(pedido);
+
+    }
+
+    /**
+     * <p>Remove um {@link ItemPedido} do Pedido
+     * e exclui no banco de dados, somente se o Pedido
+     * estiver com satatusABERTO</p>
+     *
+     * @param idPedido     Id do pedido.
+     * @param idItemPedido Id do ItemPedido a ser removido.
+     */
+    public Pedido removerItemPedido(UUID idPedido, UUID idItemPedido) {
+
+        var pedido = this.findById(idPedido);
+
+        pedido.removerItemPedido(idItemPedido);
 
         return save(pedido);
     }

@@ -1,9 +1,7 @@
 package com.ccs.erp.domain.entity;
 
 import com.ccs.erp.domain.factory.ItemFactory;
-import com.ccs.erp.domain.factory.ItemPedidoFactory;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

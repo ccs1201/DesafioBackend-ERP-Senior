@@ -44,7 +44,7 @@ public interface ItemControllerDoc {
     @Operation(summary = "Cadastrar Produto", description = "Cadastra um Item como Produto")
     CompletableFuture<ItemResponse> cadastrarProduto(ItemInput itemInput);
 
-    @Operation(summary = "Excluir", description = "Excluí um item somente se ele não estiver a associado a um pedido")
+    @Operation(summary = "Excluir", description = "Excluí um item, somente se ele não estiver a associado a um pedido")
     @Parameter(name = "id", description = "ID do item a ser removido", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     @ApiResponse(responseCode = "409", description = "Se o item não puder ser excluido",
             content = @Content(

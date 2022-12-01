@@ -1,7 +1,6 @@
 package com.ccs.erp.api.model.input;
 
 import com.ccs.erp.api.model.input.IDs.ItemIdInput;
-import com.fasterxml.jackson.annotation.JsonRootName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

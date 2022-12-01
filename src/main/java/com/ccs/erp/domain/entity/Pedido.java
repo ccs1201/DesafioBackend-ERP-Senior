@@ -1,6 +1,7 @@
 package com.ccs.erp.domain.entity;
 
 import com.ccs.erp.core.exception.DescontoException;
+import com.ccs.erp.core.exception.PedidoException;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
@@ -54,6 +55,8 @@ public class Pedido {
     @UpdateTimestamp
     private OffsetDateTime ultimaAtualizacao;
 
+    @Transient
+    private final String MSG_PEDIDO_FECHADO = "Pedido FECHADO, não pode ser alterado.";
 
     public BigDecimal getValorTotalPedido() {
         if (valorTotalPedido.equals(BigDecimal.ZERO)) {
@@ -71,14 +74,28 @@ public class Pedido {
 
     /**
      * <p>Adiciona um {@link ItemPedido} ao pedido.</p>
+     * <p>Somenete se o {@link Item} estiver ativo e
+     * statusPedido estiver ABERTO e atualiza os totais</p>
      *
      * @param itemPedido Item a ser adicionado.
+     * @throws PedidoException se o Item estiver inativo ou o Pedido FECHADO
      */
     public void addItemPedido(ItemPedido itemPedido) {
+
+        if (statusPedido.equals(StatusPedido.FECHADO)) {
+            throw new PedidoException(MSG_PEDIDO_FECHADO);
+        }
+
+        if (!itemPedido.getItem().getAtivo()) {
+            throw new PedidoException(String
+                    .format("Item: %s inativo, não pode ser adicionado ao pedido.", itemPedido.getItem().getNome()));
+        }
+
         if (itensPedido == null) {
             itensPedido = new ArrayList<>();
         }
         this.itensPedido.add(itemPedido);
+        calcularTotais();
     }
 
 
@@ -200,5 +217,33 @@ public class Pedido {
      */
     public void abrir() {
         statusPedido = StatusPedido.ABERTO;
+    }
+
+    /**
+     * <p>Remove um {@link ItemPedido} do pedido somente
+     * se o Pedido estiver ABERTO e atualiza os totais</p>
+     *
+     * @param idItemPedido id do {@link ItemPedido} a ser removido
+     * @throws PedidoException se o pedido estiver fechado ou
+     *                         se o ItemPedido não existir
+     */
+    public void removerItemPedido(UUID idItemPedido) {
+        if (statusPedido.equals(StatusPedido.FECHADO)) {
+            throw new PedidoException(MSG_PEDIDO_FECHADO);
+        }
+
+        //Aqui buscamos o itemPedido diretamente no pedido em memória em tese mais rápido
+        //outra aopção seria buscarmos o itemPedido diretamente no banco pelo ID.
+        //é uma decissão de design :)
+        var itemPedido = getItensPedido()
+                .stream()
+                .filter(itemPedido1 -> itemPedido1.getId().equals(idItemPedido))
+                .findFirst()
+                .orElseThrow(() ->
+                        new PedidoException("O item ID: %s, não pertence ao pedido informado."));
+
+        itensPedido.remove(itemPedido);
+
+        calcularTotais();
     }
 }

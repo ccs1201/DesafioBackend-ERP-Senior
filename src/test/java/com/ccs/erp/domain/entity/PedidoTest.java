@@ -1,8 +1,10 @@
 package com.ccs.erp.domain.entity;
 
 import com.ccs.erp.core.exception.DescontoException;
+import com.ccs.erp.core.exception.PedidoException;
 import com.ccs.erp.domain.factory.ItemFactory;
 import com.ccs.erp.domain.factory.ItemPedidoFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import java.util.LinkedList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Slf4j
 class PedidoTest {
     private static final int PERCENTUAL_DESCONTO_ZERO = 0;
     private static final int PERCENTUAL_DESCONTO_NEGATIVO = -1;
@@ -115,7 +118,7 @@ class PedidoTest {
 
     @Test
     @DisplayName("Testa Desconto Maior que 100")
-    void testaDescontoMaioRQueCem() {
+    void testaDescontoMaiorQueCem() {
 
         assertThrows(DescontoException.class,
                 () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_MAIOR_MAXIMO));
@@ -188,4 +191,48 @@ class PedidoTest {
 
     }
 
+    @Test
+    @DisplayName("Testa adicionar Item ao pedido")
+    void testaAdicionarItemAoPedido() {
+        pedido.addItemPedido(ItemPedidoFactory.apenasProduto());
+
+        assertEquals(3, pedido.getItensPedido().size());
+    }
+
+    @Test
+    @DisplayName("Testa adicionar Item ao pedido com item inativo")
+    void testaAdicionarItemInativoAoPedido() {
+
+        assertThrows(PedidoException.class, () ->
+                pedido.addItemPedido(ItemPedidoFactory.itemProdutoInativo())
+        );
+    }
+
+    @Test
+    @DisplayName("Testa adicionar Item com pedido FECHADO")
+    void testaAdicionarItemComPedidoFechado() {
+        assertThrows(PedidoException.class, () -> {
+
+            pedido.setStatusPedido(StatusPedido.FECHADO);
+            pedido.addItemPedido(ItemPedidoFactory.apenasProduto());
+        });
+    }
+
+    @Test
+    @DisplayName("Testa Remover Item com Pedido FECHADO")
+    void testaRemoverItemComPedidoFechado() {
+
+        assertThrows(PedidoException.class, () -> {
+
+            pedido.setStatusPedido(StatusPedido.FECHADO);
+            pedido.removerItemPedido(ItemPedidoFactory.apenasProduto().getId());
+        });
+    }
+
+    @Test
+    @DisplayName("Testa Remover Item do Pedido")
+    void testaRemoverItemDoPedido() {
+        pedido.removerItemPedido(pedido.getItensPedido().stream().findAny().get().getId());
+        assertEquals(1, pedido.getItensPedido().size());
+    }
 }

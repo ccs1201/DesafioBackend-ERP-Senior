@@ -5,6 +5,8 @@ import com.ccs.erp.domain.entity.ItemPedido;
 import com.ccs.erp.domain.entity.Pedido;
 import com.ccs.erp.domain.repository.ItemRepository;
 
+import java.util.UUID;
+
 
 public class ItemPedidoFactory {
 
@@ -18,6 +20,7 @@ public class ItemPedidoFactory {
      */
     public static ItemPedido apenasServico() {
         var itemPedido = ItemPedido.builder()
+                .id(UUID.randomUUID())
                 .quantidade(QTD_DEZ)
                 .build();
 
@@ -34,6 +37,7 @@ public class ItemPedidoFactory {
      */
     public static ItemPedido apenasProduto() {
         var itemPedido = ItemPedido.builder()
+                .id(UUID.randomUUID())
                 .quantidade(QTD_DEZ)
                 .build();
         itemPedido.setItem(ItemFactory.buildItemProduto());
@@ -53,6 +57,26 @@ public class ItemPedidoFactory {
                 .quantidade(QTD_DEZ)
                 .build();
         itemPedido.setItem(itemRepository.findAll().get(0));
+
+        return itemPedido;
+    }
+
+    public static ItemPedido itemProdutoInativo() {
+        var itemPedido = ItemPedido.builder()
+                .id(UUID.randomUUID())
+                .quantidade(QTD_DEZ)
+                .build();
+        itemPedido.setItem(ItemFactory.itemProdutoInativo());
+
+        return itemPedido;
+    }
+
+    public static ItemPedido itemServicoInativo() {
+        var itemPedido = ItemPedido.builder()
+                .id(UUID.randomUUID())
+                .quantidade(QTD_DEZ)
+                .build();
+        itemPedido.setItem(ItemFactory.itemServicoInativo());
 
         return itemPedido;
     }
