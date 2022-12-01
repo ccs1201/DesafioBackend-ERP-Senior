@@ -1,8 +1,10 @@
 package com.ccs.erp.api.v1.controller;
 
+import com.ccs.erp.api.model.input.ItemPedidoInput;
 import com.ccs.erp.api.model.input.PedidoInput;
 import com.ccs.erp.api.model.response.PedidoResponse;
 import com.ccs.erp.api.v1.controller.documentation.PedidoControllerDoc;
+import com.ccs.erp.core.utils.mapper.ItemPedidoMapper;
 import com.ccs.erp.core.utils.mapper.PedidoMapper;
 import com.ccs.erp.domain.service.PedidoService;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,6 +34,7 @@ public class PedidoController implements PedidoControllerDoc {
 
     private final PedidoService service;
     private final PedidoMapper mapper;
+    private final ItemPedidoMapper itemPedidoMapper;
 
     @Override
     @GetMapping
@@ -115,9 +118,29 @@ public class PedidoController implements PedidoControllerDoc {
     @PatchMapping("/{id}/descontoProduto")
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public CompletableFuture<PedidoResponse> aplicarDescontoSomenteProduto(@PathVariable UUID id, @RequestParam @NonNull Integer percentual) {
+    public CompletableFuture<PedidoResponse> aplicarDescontoSomenteProduto(@PathVariable UUID id,
+                                                                           @RequestParam @NonNull Integer percentual) {
         return supplyAsync(() ->
                 service.aplicarDescontoSomenteProduto(id, percentual), ForkJoinPool.commonPool())
                 .thenApply(mapper::toModel);
+    }
+
+    @DeleteMapping("{idPedido}/itemPedido/{idItemPedido}")
+    @ResponseStatus(HttpStatus.OK)
+    public CompletableFuture<PedidoResponse> removerItem(@PathVariable UUID idPedido,
+                                                         @PathVariable UUID idItemPedido) {
+        return supplyAsync(() ->
+                service.removerItemPedido(idPedido, idItemPedido), ForkJoinPool.commonPool()
+        ).thenApply(mapper::toModel);
+    }
+
+    @PatchMapping("/{id}/adicionaItem")
+    @ResponseStatus(HttpStatus.OK)
+    public CompletableFuture<PedidoResponse> adicionarItem(@PathVariable UUID id,
+                                                           @RequestBody @Valid ItemPedidoInput itemPedidoInput) {
+        return supplyAsync(() ->
+                service.adicionarItemPedido(
+                        itemPedidoMapper.toEntity(itemPedidoInput), id), ForkJoinPool.commonPool()
+        ).thenApply(mapper::toModel);
     }
 }

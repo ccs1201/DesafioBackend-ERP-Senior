@@ -5,6 +5,7 @@ import com.ccs.erp.core.exception.PedidoException;
 import com.ccs.erp.domain.factory.ItemFactory;
 import com.ccs.erp.domain.factory.ItemPedidoFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.query.criteria.internal.ValueHandlerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -234,5 +236,28 @@ class PedidoTest {
     void testaRemoverItemDoPedido() {
         pedido.removerItemPedido(pedido.getItensPedido().stream().findAny().get().getId());
         assertEquals(1, pedido.getItensPedido().size());
+    }
+
+    @Test
+    @DisplayName("Testa Remover Item do Pedido com ID inexistente")
+    void testaRemoverItemComIdInexistente() {
+        assertThrows(PedidoException.class, () ->
+                pedido.removerItemPedido(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("Verifica total Pedido após remover item")
+    void verificarTotalAposRemoverItem() {
+        var totalExpected = BigDecimal.valueOf(1000).setScale(2);
+        pedido.removerItemPedido(pedido.getItensPedido().stream().findAny().get().getId());
+        assertEquals(totalExpected, pedido.getValorTotalPedido());
+    }
+
+    @Test
+    @DisplayName("Verifica total Pedido após Adicionar item")
+    void verificarTotalAposAdicionarItem() {
+        var totalExpected = BigDecimal.valueOf(3000).setScale(2);
+        pedido.addItemPedido(ItemPedidoFactory.apenasProduto());
+        assertEquals(totalExpected, pedido.getValorTotalPedido());
     }
 }

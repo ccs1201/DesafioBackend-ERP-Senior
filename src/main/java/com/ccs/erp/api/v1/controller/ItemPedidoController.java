@@ -40,7 +40,7 @@ public class ItemPedidoController {
     @ResponseStatus
     public CompletableFuture<ItemPedidoResponse> findById(@PathVariable UUID id){
         return supplyAsync(()->
-                service.fidById(id), ForkJoinPool.commonPool()
+                service.findById(id), ForkJoinPool.commonPool()
         ).thenApply(mapper::toModel);
     }
 

@@ -9,6 +9,8 @@ import com.ccs.erp.api.v1.controller.PedidoController;
 import com.ccs.erp.domain.entity.StatusPedido;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -36,7 +38,7 @@ public class LinksBuilder {
     public void linkToPedidoResponse(PedidoResponse response) {
         //adiciona os links do item
         response.getItensPedido().forEach((itemPedidoResponse) -> {
-            linkToItemPedidoResponse(itemPedidoResponse);
+            linkToItemPedidoResponse(itemPedidoResponse, response.getId());
             this.linkToItemResponse(itemPedidoResponse.getItem());
         });
 
@@ -50,9 +52,13 @@ public class LinksBuilder {
                 linkTo(methodOn(pedidoControllerClass).fechar(response.getId())).withRel("fechar"));
     }
 
-    public void linkToItemPedidoResponse(ItemPedidoResponse response) {
+    public void linkToItemPedidoResponse(ItemPedidoResponse response, UUID idPedido) {
 
-        response.add(linkTo(itemPedidoControllerClass).withRel("itensPedido"));
+        response
+                .add(linkTo((itemPedidoControllerClass)).withSelfRel())
+                .add(linkTo(methodOn(pedidoControllerClass)
+                        .removerItem(idPedido, response.getItem().getId())).withRel("remover item"))
+                .add(linkTo(itemPedidoControllerClass).withRel("itensPedido"));
 
     }
 }
