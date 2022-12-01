@@ -6,6 +6,8 @@ import com.ccs.erp.api.model.response.PedidoResponse;
 import com.ccs.erp.api.v1.controller.documentation.PedidoControllerDoc;
 import com.ccs.erp.core.utils.mapper.ItemPedidoMapper;
 import com.ccs.erp.core.utils.mapper.PedidoMapper;
+import com.ccs.erp.domain.entity.StatusPedido;
+import com.ccs.erp.domain.entity.TipoItem;
 import com.ccs.erp.domain.service.PedidoService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -48,6 +51,22 @@ public class PedidoController implements PedidoControllerDoc {
         return supplyAsync(() ->
                 service.findAll(PageRequest.of(page, size, direction, sort)), ForkJoinPool.commonPool())
                 .thenApply(mapper::toPage);
+    }
+
+    @Override
+    @GetMapping("/filtro")
+    @ResponseStatus(HttpStatus.OK)
+    public CompletableFuture<Page<PedidoResponse>> filtrar(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "5") int size,
+                                                           @RequestParam(defaultValue = "dataPedido") String sort,
+                                                           @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+                                                           @RequestParam @Nullable String nome,
+                                                           @RequestParam @Nullable TipoItem tipoItem,
+                                                           @RequestParam @Nullable StatusPedido statusPedido) {
+        return supplyAsync(() ->
+                        service.filtrar(PageRequest.of(page, size, direction, sort), nome, tipoItem, statusPedido),
+                ForkJoinPool.commonPool()
+        ).thenApply(mapper::toPage);
     }
 
     @Override
@@ -87,11 +106,9 @@ public class PedidoController implements PedidoControllerDoc {
 
     @Override
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<PedidoResponse> atualizar(@RequestBody @Valid PedidoInput pedidoInput, @PathVariable UUID id) {
-        return supplyAsync(() ->
-                service.update(id, mapper.toEntity(pedidoInput)), ForkJoinPool.commonPool())
-                .thenApply(mapper::toModel);
+    @ResponseStatus(HttpStatus.NOT_MODIFIED)
+    public CompletableFuture<Void> atualizar(@RequestBody @Valid PedidoInput pedidoInput, @PathVariable UUID id) {
+        return null;
     }
 
     @Override

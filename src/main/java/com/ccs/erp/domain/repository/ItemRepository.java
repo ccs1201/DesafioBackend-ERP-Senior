@@ -13,8 +13,8 @@ import java.util.UUID;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, UUID> {
 
-    final String FIND_BY_QUERY = """
-            from Item  i where (:nome is null or i.nome like %:nome%) 
+    String FIND_BY_QUERY = """
+            from Item  i where (:nome is null or i.nome like lower(concat('%', :nome, '%')))
             and 
             (:ativo is null or i.ativo= :ativo) 
             and 
@@ -23,5 +23,6 @@ public interface ItemRepository extends JpaRepository<Item, UUID> {
 
     @Query(FIND_BY_QUERY)
     Page<Item> findBy(Pageable pageable, String nome, TipoItem tipoItem, Boolean ativo);
+
 
 }

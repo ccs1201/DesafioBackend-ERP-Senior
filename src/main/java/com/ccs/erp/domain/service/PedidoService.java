@@ -1,12 +1,7 @@
 package com.ccs.erp.domain.service;
 
-import com.ccs.erp.core.exception.ItemNaoEncontradoException;
-import com.ccs.erp.core.exception.PedidoException;
-import com.ccs.erp.core.exception.PedidoNaoEncontradoException;
-import com.ccs.erp.core.exception.RepositoryEntityPersistException;
-import com.ccs.erp.domain.entity.Item;
-import com.ccs.erp.domain.entity.ItemPedido;
-import com.ccs.erp.domain.entity.Pedido;
+import com.ccs.erp.core.exception.*;
+import com.ccs.erp.domain.entity.*;
 import com.ccs.erp.domain.repository.PedidoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +26,13 @@ public class PedidoService {
 
 
     public Page<Pedido> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+        var pedidos = repository.findAll(pageable);
+
+        if (pedidos.isEmpty()) {
+            throw new RepositoryEntityNotFoundException("Nehum pedido localizado.");
+        }
+
+        return pedidos;
     }
 
 
@@ -205,5 +206,13 @@ public class PedidoService {
         pedido.removerItemPedido(idItemPedido);
 
         return save(pedido);
+    }
+
+    public Page<Pedido> filtrar(Pageable pageable, String nome, TipoItem tipoItem, StatusPedido statusPedido) {
+        var pedidos = repository.filtrar(pageable, nome, tipoItem, statusPedido);
+
+
+
+        return pedidos;
     }
 }

@@ -18,7 +18,11 @@ public class ItemPedidoService {
 
     public Page<ItemPedido> findAll(Pageable pageable) {
 
-        return repository.findAll(pageable);
+        var itens = repository.findAll(pageable);
+        if (itens.isEmpty()) {
+            throw new RepositoryEntityNotFoundException("Nenhum item localizado.");
+        }
+        return itens;
     }
 
 

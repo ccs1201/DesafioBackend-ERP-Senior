@@ -48,16 +48,19 @@ public class LinksBuilder {
                 .add(linkTo(methodOn(pedidoControllerClass).excluir(response.getId())).withRel("excluir"));
         //Adiciona os links conforme o stats do Pedido
         response.add((response.getStatusPedido().equals(StatusPedido.FECHADO)) ?
-                linkTo(methodOn(pedidoControllerClass).abrir(response.getId())).withRel("abrir") :
-                linkTo(methodOn(pedidoControllerClass).fechar(response.getId())).withRel("fechar"));
+                        linkTo(methodOn(pedidoControllerClass).abrir(response.getId())).withRel("abrir") :
+                        linkTo(methodOn(pedidoControllerClass).fechar(response.getId())).withRel("fechar"))
+                .add(linkTo(methodOn(pedidoControllerClass)
+                        .adicionarItem(response.getId(), null)).withRel("adicionar item"))
+                .add(linkTo(pedidoControllerClass).withRel("pedidos"));
     }
 
     public void linkToItemPedidoResponse(ItemPedidoResponse response, UUID idPedido) {
 
         response
-                .add(linkTo((itemPedidoControllerClass)).withSelfRel())
+                .add(linkTo(methodOn(itemPedidoControllerClass).findById(response.getId())).withSelfRel())
                 .add(linkTo(methodOn(pedidoControllerClass)
-                        .removerItem(idPedido, response.getItem().getId())).withRel("remover item"))
+                        .removerItem(idPedido, response.getId())).withRel("remover item"))
                 .add(linkTo(itemPedidoControllerClass).withRel("itensPedido"));
 
     }

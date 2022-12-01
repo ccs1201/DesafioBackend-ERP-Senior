@@ -1,9 +1,6 @@
 package com.ccs.erp.domain.service;
 
-import com.ccs.erp.core.exception.ItemJaCadastradoException;
-import com.ccs.erp.core.exception.ItemNaoEncontradoException;
-import com.ccs.erp.core.exception.RepositoryEntityInUseException;
-import com.ccs.erp.core.exception.RepositoryEntityPersistException;
+import com.ccs.erp.core.exception.*;
 import com.ccs.erp.domain.entity.Item;
 import com.ccs.erp.domain.entity.TipoItem;
 import com.ccs.erp.domain.repository.ItemRepository;
@@ -26,7 +23,11 @@ public class ItemService {
     private final ItemRepository repository;
 
     public Page<Item> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+        var itens = repository.findAll(pageable);
+        if (itens.isEmpty()) {
+            throw new RepositoryEntityNotFoundException("Nehum item localizado");
+        }
+        return itens;
     }
 
     public Item findById(UUID uuid) {
@@ -98,7 +99,7 @@ public class ItemService {
         var itens = repository.findBy(pageable, nome, tipoItem, ativo);
 
         if (itens.isEmpty()) {
-            throw new ItemNaoEncontradoException("Nenhum registro encontro para os parâmetros informados");
+            throw new ItemNaoEncontradoException("Nenhum registro encontrado para os parâmetros informados");
         }
 
         return itens;

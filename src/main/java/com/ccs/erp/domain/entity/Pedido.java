@@ -31,7 +31,7 @@ public class Pedido {
     @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false)
     private UUID id;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "pedido", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private Collection<ItemPedido> itensPedido;
     @Column(nullable = false)
     @PositiveOrZero
@@ -95,6 +95,8 @@ public class Pedido {
             itensPedido = new ArrayList<>();
         }
         this.itensPedido.add(itemPedido);
+
+        aplicarDesconto(percentualDesconto);
         calcularTotais();
     }
 
@@ -154,7 +156,8 @@ public class Pedido {
      * @param vlrDescontoTotalItem
      */
     private void atualizarValorTotalDesconto(BigDecimal vlrDescontoTotalItem) {
-        valorTotalDesconto = valorTotalDesconto.add(vlrDescontoTotalItem).setScale(2, RoundingMode.HALF_UP);
+        valorTotalDesconto = valorTotalDesconto
+                .add(vlrDescontoTotalItem).setScale(2, RoundingMode.HALF_UP);
     }
 
     private BigDecimal descontoToDecimal() {
@@ -166,8 +169,8 @@ public class Pedido {
 
     private void validarLimiteDesconto(int percentualDesconto) {
 
-        if (percentualDesconto < 1 || percentualDesconto > 100) {
-            throw new DescontoException("Percentual de Desconto não permito, informe um valor entre 1 e 100.");
+        if (percentualDesconto < 0 || percentualDesconto > 100) {
+            throw new DescontoException("Percentual de Desconto não permito, informe um valor entre 1 e 100. Valor Informado: " + percentualDesconto);
         }
     }
 
@@ -234,16 +237,18 @@ public class Pedido {
 
         //Aqui buscamos o itemPedido diretamente no pedido em memória em tese mais rápido
         //outra aopção seria buscarmos o itemPedido diretamente no banco pelo ID.
-        //é uma decissão de design :)
+        //é uma decissão de design ;)
         var itemPedido = getItensPedido()
                 .stream()
                 .filter(itemPedido1 -> itemPedido1.getId().equals(idItemPedido))
                 .findFirst()
                 .orElseThrow(() ->
-                        new PedidoException("O item ID: %s, não pertence ao pedido informado."));
+                        new PedidoException(String.format("O item ID: %s, não pertence ao pedido informado.", idItemPedido)));
 
         itensPedido.remove(itemPedido);
 
+        aplicarDesconto(percentualDesconto);
         calcularTotais();
+
     }
 }

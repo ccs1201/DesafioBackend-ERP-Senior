@@ -20,10 +20,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 @RestController
 @RequestMapping("/api/v1/itensPedidos")
 @RequiredArgsConstructor
-public class ItemPedidoController {
+public class ItemPedidoController implements com.ccs.erp.api.v1.controller.documentation.ItemPedidoControllerDoc {
     private final ItemPedidoMapper mapper;
     private final ItemPedidoService service;
 
+    @Override
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<Page<ItemPedidoResponse>> getAll(@Nullable @RequestParam(defaultValue = "0") int page,
@@ -36,6 +37,7 @@ public class ItemPedidoController {
                 .thenApply(mapper::toPage);
     }
 
+    @Override
     @GetMapping("/{id}")
     @ResponseStatus
     public CompletableFuture<ItemPedidoResponse> findById(@PathVariable UUID id){

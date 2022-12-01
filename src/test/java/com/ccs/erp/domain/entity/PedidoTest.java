@@ -5,7 +5,6 @@ import com.ccs.erp.core.exception.PedidoException;
 import com.ccs.erp.domain.factory.ItemFactory;
 import com.ccs.erp.domain.factory.ItemPedidoFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.query.criteria.internal.ValueHandlerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +53,6 @@ class PedidoTest {
 
         pedido.getItensPedido().add(itemPedidoServico);
         pedido.getItensPedido().add(itemPedidoProduto);
-
     }
 
     @Test
@@ -100,14 +98,6 @@ class PedidoTest {
 
         assertEquals(totalDescontoExpected, pedido.getValorTotalDesconto());
 
-    }
-
-    @Test
-    @DisplayName("Testa Desconto ZERO por cento")
-    void testaDescontoZero() {
-
-        assertThrows(DescontoException.class,
-                () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_ZERO));
     }
 
     @Test
@@ -194,6 +184,42 @@ class PedidoTest {
     }
 
     @Test
+    @DisplayName("Testa total após adicionar item")
+    void totalAposAdicinarItem() {
+
+        var totalDesconto = BigDecimal.valueOf(200).setScale(2);
+        var totalPedido = BigDecimal.valueOf(2800).setScale(2);
+        var totalItens = BigDecimal.valueOf(3000).setScale(2);
+
+
+        pedido.setPercentualDesconto(PERCENTUAL_DESCONTO_DEZ);
+        pedido.addItemPedido(ItemPedidoFactory.apenasProduto());
+
+        assertEquals(totalDesconto, pedido.getValorTotalDesconto());
+        assertEquals(totalPedido, pedido.getValorTotalPedido());
+        assertEquals(totalItens, pedido.getValorTotalItens());
+
+    }
+
+    @Test
+    @DisplayName("Testa total após remover item")
+    void totalAposRemoverItem() {
+
+        var totalDesconto = BigDecimal.valueOf(100).setScale(2);
+        var totalPedido = BigDecimal.valueOf(900).setScale(2);
+        var totalItens = BigDecimal.valueOf(1000).setScale(2);
+
+
+        pedido.setPercentualDesconto(PERCENTUAL_DESCONTO_DEZ);
+        pedido.removerItemPedido(pedido.getItensPedido().stream().findFirst().get().getId());
+
+        assertEquals(totalDesconto, pedido.getValorTotalDesconto());
+        assertEquals(totalPedido, pedido.getValorTotalPedido());
+        assertEquals(totalItens, pedido.getValorTotalItens());
+
+    }
+
+    @Test
     @DisplayName("Testa adicionar Item ao pedido")
     void testaAdicionarItemAoPedido() {
         pedido.addItemPedido(ItemPedidoFactory.apenasProduto());
@@ -257,7 +283,11 @@ class PedidoTest {
     @DisplayName("Verifica total Pedido após Adicionar item")
     void verificarTotalAposAdicionarItem() {
         var totalExpected = BigDecimal.valueOf(3000).setScale(2);
+
         pedido.addItemPedido(ItemPedidoFactory.apenasProduto());
+
         assertEquals(totalExpected, pedido.getValorTotalPedido());
     }
+
+
 }

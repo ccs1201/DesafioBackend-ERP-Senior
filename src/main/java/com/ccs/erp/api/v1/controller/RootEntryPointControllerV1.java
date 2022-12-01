@@ -30,7 +30,8 @@ public class RootEntryPointControllerV1 {
                     var root = new RootEntryPointModelV1();
 
                     root.add(linkTo(ItemController.class).withRel("itens"))
-                            .add(linkTo(PedidoController.class).withRel("pedidos"));
+                            .add(linkTo(PedidoController.class).withRel("pedidos"))
+                            .add(linkTo(ItemPedidoController.class).withRel("itens pedido"));
 
                     return root;
                 }, ForkJoinPool.commonPool()

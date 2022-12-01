@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -29,6 +30,10 @@ public interface ItemControllerDoc {
             @Parameter(name = "sort", description = "Atributo que será baseada a ordenação", example = "nome"),
             @Parameter(name = "direction", description = "Ordenação Ascendente ou Descendente")
     })
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Se nenhum item for encontrado",
+                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
+    })
     CompletableFuture<Page<ItemResponse>> getAll(int page, int size, String sort, Sort.Direction direction);
 
 
@@ -36,6 +41,8 @@ public interface ItemControllerDoc {
     @Parameters({
             @Parameter(name = "id", description = "ID do item a ser encontrado", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     })
+    @ApiResponse(responseCode = "404", description = "Quando o Item não for encontrado",
+            content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
     CompletableFuture<ItemResponse> getById(UUID id);
 
     @Operation(summary = "Cadastrar Serviço", description = "Cadastra um Item como Serviço")
@@ -46,22 +53,39 @@ public interface ItemControllerDoc {
 
     @Operation(summary = "Excluir", description = "Excluí um item, somente se ele não estiver a associado a um pedido")
     @Parameter(name = "id", description = "ID do item a ser removido", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    @ApiResponse(responseCode = "409", description = "Se o item não puder ser excluido",
-            content = @Content(
-                    schema = @Schema(implementation = ApiExceptionResponse.class)))
+    @ApiResponses({
+            @ApiResponse(responseCode = "409", description = "Se o item não puder ser excluido",
+                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Se o item não existir",
+                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
+    })
     CompletableFuture<Void> excluir(UUID id);
 
     @Operation(summary = "Atualizar", description = "Atualiza um Item.")
     @Parameter(name = "id", description = "ID do item a ser atualizado", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    @ApiResponses({
+            @ApiResponse(responseCode = "400", description = "Quanto um ou mais atributos forem inválidos",
+                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Se o item não existir",
+                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
+    })
     CompletableFuture<ItemResponse> atualizar(ItemInput itemInput,
                                               UUID id);
 
     @Operation(summary = "Ativo", description = "Ativa um item")
     @Parameter(name = "id", description = "ID do item a ser ativado")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Se o item não existir",
+                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
+    })
     CompletableFuture<Void> ativar(UUID id);
 
     @Operation(summary = "Inativo", description = "Inativa um item")
     @Parameter(name = "id", description = "ID do item a ser inativado")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Se o item não existir",
+                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
+    })
     CompletableFuture<Void> inativar(UUID id);
 
     @Operation(summary = "Busca itens com por critérios dinâmicos",
@@ -73,6 +97,11 @@ public interface ItemControllerDoc {
                     @Parameter(name = "page", description = "Numero da pagina", allowEmptyValue = true),
                     @Parameter(name = "size", description = "Quantidade de Itens por página", allowEmptyValue = true),
                     @Parameter(name = "sort", description = "Atributo para ordenação do resultado", example = "nome", allowEmptyValue = true),
+                    @Parameter(name = "direction", description = "Sentido de ordenação")
             })
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Se nenhum item for encontrado",
+                    content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
+    })
     CompletableFuture<Page<ItemResponse>> filtrar(int page, int size, String sort, Sort.Direction direction, String nome, TipoItem tipo, Boolean ativo);
 }
