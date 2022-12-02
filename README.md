@@ -20,7 +20,8 @@
 * Pool de conexões configurado para maxímo= 20, idle= 2, time-out=10s
 * Para fazer testes de escalabilidade altere a propriedade *spring.datasource.hikari.maximum-pool-size*
 para um valor compatível com a quantido de requsições simultâneas que serão executadas, para que o pool não seja o gargalo no testes
-  *     Recomendo a ferrramenta K6 para testes de escalablidade (https://k6.io/) framework javascrip simples e prático
+  *     Recomendo a ferrramenta K6 para testes de escalablidade (https://k6.io/) 
+        framework javascrip simples e prático
 
 ### Como executar este Projeto
 
@@ -30,6 +31,7 @@ para um valor compatível com a quantido de requsições simultâneas que serão
 com os dados necessários para conexão com o seu banco (url, username, password)
 * O Flyway está configurado para:
   *     criar/validar o schema do data base.
-  *     Apagar todos os registros a cada reinicialização da aplicação e inserir uma massa de dados padrão para testes.
-  *     Para desativar a inserção dos dados de teste comente com um UNDERSCORE ("_") o arquivo afterMigrate.sql 
-        contido em resources/db/migration/   
+  *     Apagar todos os registros a cada reinicialização da aplicação e inserir uma 
+        massa de dados padrão para testes.
+  *     Para desativar a inserção dos dados de teste comente com um UNDERSCORE ("_") 
+        o arquivo afterMigrate.sql contido em resources/db/migration/   
