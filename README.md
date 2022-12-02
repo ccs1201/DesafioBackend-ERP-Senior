@@ -34,4 +34,4 @@ com os dados necessários para conexão com o seu banco (url, username, password
   *     Apagar todos os registros a cada reinicialização da aplicação e inserir uma 
         massa de dados padrão para testes.
   *     Para desativar a inserção dos dados de teste comente com um UNDERSCORE ("_") 
-        o arquivo afterMigrate.sql contido em resources/db/migration/   
+        o arquivo afterMigrate.sql contido em resources/db/migration/testdata
