@@ -94,7 +94,7 @@ public class ItemService {
         return this.save(item);
     }
 
-    public Page<Item> findBy(Pageable pageable, String nome, TipoItem tipoItem, Boolean ativo) {
+    public Page<Item> filtrar(Pageable pageable, String nome, TipoItem tipoItem, Boolean ativo) {
 
         var itens = repository.findBy(pageable, nome, tipoItem, ativo);
 

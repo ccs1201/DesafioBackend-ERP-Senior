@@ -46,12 +46,14 @@ public class LinksBuilder {
                 .add(linkTo(methodOn(pedidoControllerClass).getById(response.getId())).withSelfRel())
                 .add(linkTo(methodOn(pedidoControllerClass).atualizar(null, response.getId())).withRel("atualizar"))
                 .add(linkTo(methodOn(pedidoControllerClass).excluir(response.getId())).withRel("excluir"));
-        //Adiciona os links conforme o stats do Pedido
+        //Adiciona os links conforme o status do Pedido
         response.add((response.getStatusPedido().equals(StatusPedido.FECHADO)) ?
                         linkTo(methodOn(pedidoControllerClass).abrir(response.getId())).withRel("abrir") :
                         linkTo(methodOn(pedidoControllerClass).fechar(response.getId())).withRel("fechar"))
                 .add(linkTo(methodOn(pedidoControllerClass)
                         .adicionarItem(response.getId(), null)).withRel("adicionar item"))
+                .add(linkTo(methodOn(pedidoControllerClass)
+                        .aplicarDescontoSomenteProduto(response.getId(),null)).withRel("aplicar desconto"))
                 .add(linkTo(pedidoControllerClass).withRel("pedidos"));
     }
 

@@ -17,14 +17,14 @@ public interface PedidoRepository extends JpaRepository<Pedido, UUID> {
 
     String FIND_ALL_QUERY = """
             select p from Pedido p 
-            join fetch p.itensPedido itensPedido 
+            join fetch p.itensPedido itensPedido
             join fetch itensPedido.item item
             """;
     String FILTER_QUERY = """
             select p from Pedido p 
             join fetch p.itensPedido ip 
             join fetch ip.item i
-            where (:nome is null or i.nome like lower(concat('%', :nome, '%')))
+            where (:nome is null or lower(i.nome) like lower(concat('%', :nome, '%')))
             and 
             (:tipoItem is null or i.tipoItem= :tipoItem) 
             and

@@ -67,12 +67,12 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
      * @param e uma exceção não prevista no handler
      * @return ResponseEntity
      */
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<Object> unCaughtHandler(Exception e) {
-//        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR,
-//                String.format("Erro inesperado, por favor contate o administrador do sistema. Detalhes: %s",
-//                        e.getMessage()), "Ocorreu um erro inesperado.");
-//    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> unCaughtHandler(Exception e) {
+        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR,
+                String.format("Erro inesperado, por favor contate o administrador do sistema. Detalhes: %s",
+                        e.getMessage()), "Ocorreu um erro inesperado.");
+    }
 
     /**
      * <p><b>Handler genérico para capturar qualquer {@link RuntimeException} não tratada pelo nosso handler</b></p>
@@ -80,13 +80,13 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
      * @param e uma exceção não prevista no handler
      * @return ResponseEntity
      */
-//    @ExceptionHandler(RuntimeException.class)
-//    public ResponseEntity<Object> runTimeExceptionHandler(RuntimeException e) {
-//
-//        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR,
-//                String.format("Erro inesperado, por favor contate o administrador do sistema. Detalhes: %s",
-//                        e.getMessage()), "Ocorreu um erro inesperado.");
-//    }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Object> runTimeExceptionHandler(RuntimeException e) {
+
+        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR,
+                String.format("Erro inesperado, por favor contate o administrador do sistema. Detalhes: %s",
+                        e.getMessage()), "Ocorreu um erro inesperado.");
+    }
 
     /**
      * <p><b>Hanlder para exceptions do tipo {@link MethodArgumentNotValidException}</b></p>
@@ -311,6 +311,7 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
                         .rejectedValue(e.getValue().toString())
                         .build()
         );
+        errorResponse.setTitle("Um ou mais parâmetros são inválidos");
 
 
         return ResponseEntity.status(status).body(errorResponse);

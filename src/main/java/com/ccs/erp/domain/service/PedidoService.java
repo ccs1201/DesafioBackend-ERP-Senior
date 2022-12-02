@@ -211,6 +211,9 @@ public class PedidoService {
     public Page<Pedido> filtrar(Pageable pageable, String nome, TipoItem tipoItem, StatusPedido statusPedido) {
         var pedidos = repository.filtrar(pageable, nome, tipoItem, statusPedido);
 
+        if (pedidos.isEmpty()) {
+            throw new RepositoryEntityNotFoundException("Nenum pedido encontro com os parâmetros informados.");
+        }
 
 
         return pedidos;

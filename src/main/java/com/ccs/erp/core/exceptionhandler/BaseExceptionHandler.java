@@ -2,6 +2,7 @@ package com.ccs.erp.core.exceptionhandler;
 
 
 import com.ccs.erp.core.exceptionhandler.model.ApiExceptionResponse;
+import com.ccs.erp.core.exceptionhandler.model.ApiValidationErrorResponse;
 import com.ccs.erp.core.exceptionhandler.model.FieldValidationError;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,6 +57,7 @@ public class BaseExceptionHandler extends ResponseEntityExceptionHandler {
         return ApiExceptionResponse.builder()
                 .status(status.value())
                 .type(status.getReasonPhrase())
+                .details(new ArrayList<>())
                 .build();
     }
 
@@ -81,14 +84,14 @@ public class BaseExceptionHandler extends ResponseEntityExceptionHandler {
      * @param status
      * @return
      */
-    protected ApiExceptionResponse buildWithFieldValidationsError(MethodArgumentNotValidException ex, HttpStatus status) {
+    protected ApiValidationErrorResponse buildWithFieldValidationsError(MethodArgumentNotValidException ex, HttpStatus status) {
 
-        ApiExceptionResponse apiExceptionResponse
-                = ApiExceptionResponse
+        ApiValidationErrorResponse apiExceptionResponse
+                = ApiValidationErrorResponse
                 .builder()
                 .status(status.value())
                 .type(status.getReasonPhrase())
-                .title("Um ou mais campos não são válidos.")
+//                .title("Um ou mais campos não são válidos.")
                 .build();
 
         getFieldErrors(ex.getAllErrors(), apiExceptionResponse);
@@ -106,17 +109,17 @@ public class BaseExceptionHandler extends ResponseEntityExceptionHandler {
      * <br>
      *
      * @param e                    lista de {@link ObjectError}
-     * @param apiExceptionResponse a response que será devolvida ao cliente d API
+     * @param apiValidationErrorResponse a response que será devolvida ao cliente d API
      */
-    private void getFieldErrors(List<ObjectError> e, ApiExceptionResponse apiExceptionResponse) {
+    private void getFieldErrors(List<ObjectError> e, ApiValidationErrorResponse apiValidationErrorResponse) {
 
-        apiExceptionResponse.setDetails(new LinkedList<>());
+        apiValidationErrorResponse.setDetails(new LinkedList<>());
 
         e.forEach(error -> {
 
             if (error instanceof FieldError fieldError) {
 
-                apiExceptionResponse.getDetails().add(
+                apiValidationErrorResponse.getDetails().add(
                         FieldValidationError
                                 .builder()
                                 .field(fieldError.getField())
@@ -125,7 +128,7 @@ public class BaseExceptionHandler extends ResponseEntityExceptionHandler {
                                 .build());
 
             } else {
-                apiExceptionResponse.getDetails().add(
+                apiValidationErrorResponse.getDetails().add(
                         FieldValidationError
                                 .builder()
                                 .field(error.getObjectName())

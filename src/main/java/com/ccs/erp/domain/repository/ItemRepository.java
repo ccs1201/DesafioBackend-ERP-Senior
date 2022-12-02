@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface ItemRepository extends JpaRepository<Item, UUID> {
 
     String FIND_BY_QUERY = """
-            from Item  i where (:nome is null or i.nome like lower(concat('%', :nome, '%')))
+            from Item  i where (:nome is null or lower(i.nome) like lower(concat('%', :nome, '%')))
             and 
             (:ativo is null or i.ativo= :ativo) 
             and 

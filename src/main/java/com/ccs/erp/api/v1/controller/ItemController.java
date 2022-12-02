@@ -118,7 +118,7 @@ public class ItemController implements ItemControllerDoc {
             @Nullable TipoItem tipo,
             @Nullable Boolean ativo) {
         return supplyAsync(() ->
-                service.findBy(PageRequest.of(page, size, direction, sort), nome, tipo, ativo))
+                service.filtrar(PageRequest.of(page, size, direction, sort), nome, tipo, ativo))
                 .thenApply(mapper::toPage);
     }
 }
