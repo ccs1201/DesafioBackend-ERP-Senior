@@ -67,11 +67,10 @@ public interface MapperInterface<RESPONSEMODEL, INPUTMODEL, ENTITY> {
     }
 
     /**
-     * <p><b>Transforma uma coleção de {@code ENTITY} em {@code RESPONSEMODEL} que representam
-     * entidades de domínio</b></p>
+     * <p><b>Transforma uma coleção de {@code ENTITY} em {@code RESPONSEMODEL}</b></p>
      *
      * @param collection A coleção a ser transformada.
-     * @return {@link Collection<RESPONSEMODEL>} A coleção transformada.
+     * @return {@link Collection<RESPONSEMODEL>} A coleção transformada. em {@code RESPONSEMODEL}
      */
     default Collection<RESPONSEMODEL> toCollection(Collection<ENTITY> collection) {
         return collection.stream()

@@ -194,7 +194,7 @@ public class PedidoService {
     /**
      * <p>Remove um {@link ItemPedido} do Pedido
      * e exclui no banco de dados, somente se o Pedido
-     * estiver com satatusABERTO</p>
+     * estiver com satatus ABERTO</p>
      *
      * @param idPedido     Id do pedido.
      * @param idItemPedido Id do ItemPedido a ser removido.
