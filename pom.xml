@@ -14,7 +14,7 @@
 	<name>DesafioBackend-ERP-Senior</name>
 	<description>DesafioBackend-ERP-Senior</description>
 	<properties>
-		<java.version>19</java.version>
+		<java.version>17</java.version>
 		<org-modelmapper.version>3.1.0</org-modelmapper.version>
 		<org-springdoc.version>1.6.13</org-springdoc.version>
 		<org-flyway.version>9.8.1</org-flyway.version>
