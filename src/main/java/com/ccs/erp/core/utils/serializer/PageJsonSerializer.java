@@ -8,6 +8,13 @@ import org.springframework.data.domain.Page;
 
 import java.io.IOException;
 
+/**
+ * Customiza a representação em JSON do objeto {@link Page} do Spring.
+ *
+ * @author Cleber Souza
+ * @version 1.0
+ * @since 12/2022
+ */
 @JsonComponent
 public class PageJsonSerializer extends JsonSerializer<Page<?>> {
     @Override
