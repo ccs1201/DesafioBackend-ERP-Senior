@@ -147,7 +147,8 @@ public class Pedido {
      * <p> {@code valorTotalItens} - {@code valorTotalDesconto}</p>
      */
     private void atualizarValorTotalPedido() {
-        valorTotalPedido = valorTotalItens.subtract(valorTotalDesconto).setScale(2, RoundingMode.HALF_UP);
+        valorTotalPedido =
+                valorTotalItens.subtract(valorTotalDesconto).setScale(2, RoundingMode.HALF_UP);
     }
 
     /**
@@ -178,7 +179,7 @@ public class Pedido {
      * <p>Verifica se um desconto pode ser aplicado</p>
      * <p>A regra de negocio define que somente pedido
      * com status aberto podem ter desconto. <br>
-     * Por tanto se o pedido estiver com status fechado
+     * Por tanto se o pedido estiver com status {@Link StatusPedido.FECHADO}
      * lançamos uma exceção.
      *
      * </p>
@@ -234,10 +235,11 @@ public class Pedido {
         if (statusPedido.equals(StatusPedido.FECHADO)) {
             throw new PedidoException(MSG_PEDIDO_FECHADO);
         }
-
-        //Aqui buscamos o itemPedido diretamente no pedido em memória em tese mais rápido
-        //outra aopção seria buscarmos o itemPedido diretamente no banco pelo ID.
-        //é uma decissão de design ;)
+        /*
+        Aqui buscamos o itemPedido diretamente no pedido em memória em tese mais rápido
+        outra aopção seria buscarmos o itemPedido diretamente no banco pelo ID.
+        é uma decissão de design ;)
+        */
         var itemPedido = getItensPedido()
                 .stream()
                 .filter(itemPedido1 -> itemPedido1.getId().equals(idItemPedido))
@@ -249,6 +251,5 @@ public class Pedido {
 
         aplicarDesconto(percentualDesconto);
         calcularTotais();
-
     }
 }

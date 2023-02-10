@@ -41,14 +41,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * <p>{>@code RestControllerAdvice} Responsável pelo encaminhado das
+ * <p>{@code RestControllerAdvice} Responsável pelo ecaminhamento das
  * Exceptions da API para o consumidor</p>
  *
  * @author Cleber Souza
  * @version 1.0
  * @since 22/08/2022
  */
-@SuppressWarnings("NullableProblems")
+
 @RestControllerAdvice
 @Slf4j
 public class ApiExceptionHandler extends BaseExceptionHandler {

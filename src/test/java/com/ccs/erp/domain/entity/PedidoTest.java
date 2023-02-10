@@ -288,6 +288,4 @@ class PedidoTest {
 
         assertEquals(totalExpected, pedido.getValorTotalPedido());
     }
-
-
 }

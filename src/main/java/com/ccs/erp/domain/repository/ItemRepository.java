@@ -15,14 +15,13 @@ public interface ItemRepository extends JpaRepository<Item, UUID> {
 
     String FIND_BY_QUERY = """
             from Item  i where (:nome is null or lower(i.nome) like lower(concat('%', :nome, '%')))
-            and 
-            (:ativo is null or i.ativo= :ativo) 
-            and 
-            (:tipoItem is null or i.tipoItem= :tipoItem)  order by i.nome
+             and
+             (:ativo is null or i.ativo= :ativo)
+             and
+             (:tipoItem is null or i.tipoItem= :tipoItem)  order by i.nome
             """;
 
     @Query(FIND_BY_QUERY)
     Page<Item> findBy(Pageable pageable, String nome, TipoItem tipoItem, Boolean ativo);
-
 
 }
