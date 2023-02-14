@@ -42,7 +42,12 @@ class PedidoTest {
         this.itemPedidoServico = ItemPedidoFactory.apenasServico();
 
 
-        this.pedido = Pedido.builder().observacao("Teste TESTE Teste").valorTotalDesconto(BigDecimal.ZERO).valorTotalPedido(BigDecimal.ZERO).valorTotalItens(BigDecimal.ZERO).statusPedido(StatusPedido.ABERTO).itensPedido(new ArrayList<>()).build();
+        this.pedido = Pedido.builder().observacao("Teste TESTE Teste")
+                .valorTotalDesconto(BigDecimal.ZERO)
+                .valorTotalPedido(BigDecimal.ZERO)
+                .valorTotalItens(BigDecimal.ZERO)
+                .statusPedido(StatusPedido.ABERTO)
+                .itensPedido(new ArrayList<>()).build();
 
         pedido.getItensPedido().add(itemPedidoServico);
         pedido.getItensPedido().add(itemPedidoProduto);
