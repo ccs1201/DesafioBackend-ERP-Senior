@@ -91,10 +91,10 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     /**
      * <p><b>Hanlder para exceptions do tipo {@link MethodArgumentNotValidException}</b></p>
      *
-     * @param ex      the exception
-     * @param headers the headers to be written to the response
-     * @param status  the selected response status
-     * @param request the current request
+     * @param ex      A exceção
+     * @param headers Cabeçalho da Response
+     * @param status  Status da Response
+     * @param request Requisição que causou a exception
      * @return {@link ResponseEntity} contento os campos inválidos no body
      */
     @Override

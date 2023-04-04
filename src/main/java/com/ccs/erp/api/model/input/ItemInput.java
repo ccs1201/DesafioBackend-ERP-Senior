@@ -14,14 +14,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Schema(name = "Item Input", description = "Modelo de entrada de Item")
 public class ItemInput {
-
     @NotNull
     private String nome;
-
     @Positive
     @NotNull
     private BigDecimal valor;
-
     @NotNull
     private Boolean ativo;
 }
