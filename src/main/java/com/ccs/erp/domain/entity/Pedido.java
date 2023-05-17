@@ -236,8 +236,8 @@ public class Pedido {
         }
 
         //Aqui buscamos o itemPedido diretamente no pedido em memória em tese mais rápido
-        //outra aopção seria buscarmos o itemPedido diretamente no banco pelo ID.
-        //é uma decissão de design ;)
+        //outra opção seria buscarmos o itemPedido diretamente no banco pelo ID.
+        //é uma decisão de design ;)
         var itemPedido = getItensPedido()
                 .stream()
                 .filter(itemPedido1 -> itemPedido1.getId().equals(idItemPedido))

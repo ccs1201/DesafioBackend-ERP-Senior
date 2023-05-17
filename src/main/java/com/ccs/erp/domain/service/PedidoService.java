@@ -29,7 +29,7 @@ public class PedidoService {
         var pedidos = repository.findAll(pageable);
 
         if (pedidos.isEmpty()) {
-            throw new RepositoryEntityNotFoundException("Nehum pedido localizado.");
+            throw new RepositoryEntityNotFoundException("Nenhum pedido localizado.");
         }
 
         return pedidos;
@@ -137,7 +137,7 @@ public class PedidoService {
             ));
 
             //Agora verificamos se o set contém itens
-            //e lancaçamos uma exception informando os itens inválidos
+            //e lançamos uma exception informando os itens inválidos
             verificaItensInvalido(itensInvalidos);
 
         } catch (ItemNaoEncontradoException e) {
@@ -159,7 +159,7 @@ public class PedidoService {
 
             itensInvalidos.forEach(item ->
                     message.append(String
-                            .format("O Item %s, está invativo e não pôde ser adicionado ao pedido.", item.getNome())
+                            .format("O Item %s, está inativo e não pôde ser adicionado ao pedido.", item.getNome())
                     )
             );
             throw new PedidoException(message.toString());

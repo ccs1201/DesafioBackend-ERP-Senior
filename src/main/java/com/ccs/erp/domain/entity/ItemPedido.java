@@ -45,7 +45,7 @@ public class ItemPedido {
     /**
      * Garante que ao setar um item
      * seu valor seja setado em {@code valorUnitario}
-     * @param item Item que seja adicionado ao pedido
+     * @param item Item que sera adicionado ao pedido
      */
     public void setItem(Item item) {
         this.item = item;
