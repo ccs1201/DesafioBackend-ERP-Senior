@@ -48,7 +48,8 @@ public class ItemController implements ItemControllerDoc {
     @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<ItemResponse> getById(@PathVariable UUID id) {
 
-        return supplyAsync((() -> service.findById(id)), ForkJoinPool.commonPool()).thenApply(mapper::toModel);
+        return supplyAsync((() -> service.findById(id)), ForkJoinPool.commonPool())
+                .thenApply(mapper::toModel);
     }
 
     @Override
@@ -56,7 +57,9 @@ public class ItemController implements ItemControllerDoc {
     @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<ItemResponse> cadastrarServico(@RequestBody @Valid ItemInput itemInput) {
 
-        return supplyAsync(() -> service.cadastrarServico(mapper.toEntity(itemInput)), ForkJoinPool.commonPool()).thenApply(mapper::toModel);
+        return supplyAsync(() -> service.cadastrarServico(mapper.toEntity(itemInput)),
+                ForkJoinPool.commonPool())
+                .thenApply(mapper::toModel);
     }
 
     @PostMapping("/produto")

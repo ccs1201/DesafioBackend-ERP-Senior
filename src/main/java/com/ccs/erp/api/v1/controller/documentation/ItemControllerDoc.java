@@ -64,7 +64,7 @@ public interface ItemControllerDoc {
     @Operation(summary = "Atualizar", description = "Atualiza um Item.")
     @Parameter(name = "id", description = "ID do item a ser atualizado", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     @ApiResponses({
-            @ApiResponse(responseCode = "400", description = "Quanto um ou mais atributos forem inválidos",
+            @ApiResponse(responseCode = "400", description = "Quando um ou mais atributos forem inválidos",
                     content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class))),
             @ApiResponse(responseCode = "404", description = "Se o item não existir",
                     content = @Content(schema = @Schema(implementation = ApiExceptionResponse.class)))
@@ -88,7 +88,7 @@ public interface ItemControllerDoc {
     })
     CompletableFuture<Void> inativar(UUID id);
 
-    @Operation(summary = "Busca itens com por critérios dinâmicos",
+    @Operation(summary = "Busca itens por critérios dinâmicos",
             description = "Efetua consulta de Itens por nome, tipoItem e ativo",
             parameters = {
                     @Parameter(in = ParameterIn.QUERY, name = "nome", description = "Nome do item", example = "xbox one s", allowEmptyValue = true),

@@ -41,14 +41,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * <p>{>@code RestControllerAdvice} Responsável pelo encaminhado das
+ * <p>{@code RestControllerAdvice} Responsável pelo ecaminhamento das
  * Exceptions da API para o consumidor</p>
  *
  * @author Cleber Souza
  * @version 1.0
  * @since 22/08/2022
  */
-@SuppressWarnings("NullableProblems")
+
 @RestControllerAdvice
 @Slf4j
 public class ApiExceptionHandler extends BaseExceptionHandler {
@@ -91,10 +91,10 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
     /**
      * <p><b>Hanlder para exceptions do tipo {@link MethodArgumentNotValidException}</b></p>
      *
-     * @param ex      the exception
-     * @param headers the headers to be written to the response
-     * @param status  the selected response status
-     * @param request the current request
+     * @param ex      A exceção
+     * @param headers Cabeçalho da Response
+     * @param status  Status da Response
+     * @param request Requisição que causou a exception
      * @return {@link ResponseEntity} contento os campos inválidos no body
      */
     @Override

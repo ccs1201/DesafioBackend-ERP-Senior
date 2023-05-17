@@ -11,7 +11,6 @@ class ItemPedidoTest {
 
     private final Item itemProduto;
     private final Item itemServico;
-
     private final ItemPedido itemPedido;
 
     ItemPedidoTest() {

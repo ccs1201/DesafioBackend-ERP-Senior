@@ -42,14 +42,12 @@ class PedidoTest {
         this.itemPedidoServico = ItemPedidoFactory.apenasServico();
 
 
-        this.pedido = Pedido.builder()
-                .observacao("Teste TESTE Teste")
+        this.pedido = Pedido.builder().observacao("Teste TESTE Teste")
                 .valorTotalDesconto(BigDecimal.ZERO)
                 .valorTotalPedido(BigDecimal.ZERO)
                 .valorTotalItens(BigDecimal.ZERO)
                 .statusPedido(StatusPedido.ABERTO)
-                .itensPedido(new ArrayList<>())
-                .build();
+                .itensPedido(new ArrayList<>()).build();
 
         pedido.getItensPedido().add(itemPedidoServico);
         pedido.getItensPedido().add(itemPedidoProduto);
@@ -88,7 +86,6 @@ class PedidoTest {
 
     }
 
-
     @Test
     @DisplayName("Testa Desconto Produto")
     void testaDescontoProduto() {
@@ -104,16 +101,14 @@ class PedidoTest {
     @DisplayName("Testa Desconto Negativo")
     void testaDescontoNegativo() {
 
-        assertThrows(DescontoException.class,
-                () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_NEGATIVO));
+        assertThrows(DescontoException.class, () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_NEGATIVO));
     }
 
     @Test
     @DisplayName("Testa Desconto Maior que 100")
     void testaDescontoMaiorQueCem() {
 
-        assertThrows(DescontoException.class,
-                () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_MAIOR_MAXIMO));
+        assertThrows(DescontoException.class, () -> pedido.aplicarDesconto(PERCENTUAL_DESCONTO_MAIOR_MAXIMO));
     }
 
     @Test
@@ -141,23 +136,14 @@ class PedidoTest {
     void testaAplicarDescontoPedidoFechado() {
         pedido.fechar();
 
-        assertThrows(DescontoException.class,
-                () ->
-                        pedido.aplicarDesconto(1));
+        assertThrows(DescontoException.class, () -> pedido.aplicarDesconto(1));
     }
 
 
     @Test
     @DisplayName("Testa aplicar desconto em item servico")
     void aplicarDescontoServico() {
-        var pedido = Pedido.builder()
-                .observacao("Teste TESTE Teste")
-                .valorTotalDesconto(BigDecimal.ZERO)
-                .valorTotalPedido(BigDecimal.ZERO)
-                .valorTotalItens(BigDecimal.ZERO)
-                .statusPedido(StatusPedido.ABERTO)
-                .itensPedido(new LinkedList<>())
-                .build();
+        var pedido = Pedido.builder().observacao("Teste TESTE Teste").valorTotalDesconto(BigDecimal.ZERO).valorTotalPedido(BigDecimal.ZERO).valorTotalItens(BigDecimal.ZERO).statusPedido(StatusPedido.ABERTO).itensPedido(new LinkedList<>()).build();
         pedido.addItemPedido(itemPedidoServico);
 
         var totalExpected = BigDecimal.valueOf(1000).setScale(2);
@@ -231,9 +217,7 @@ class PedidoTest {
     @DisplayName("Testa adicionar Item ao pedido com item inativo")
     void testaAdicionarItemInativoAoPedido() {
 
-        assertThrows(PedidoException.class, () ->
-                pedido.addItemPedido(ItemPedidoFactory.itemProdutoInativo())
-        );
+        assertThrows(PedidoException.class, () -> pedido.addItemPedido(ItemPedidoFactory.itemProdutoInativo()));
     }
 
     @Test
@@ -267,8 +251,7 @@ class PedidoTest {
     @Test
     @DisplayName("Testa Remover Item do Pedido com ID inexistente")
     void testaRemoverItemComIdInexistente() {
-        assertThrows(PedidoException.class, () ->
-                pedido.removerItemPedido(UUID.randomUUID()));
+        assertThrows(PedidoException.class, () -> pedido.removerItemPedido(UUID.randomUUID()));
     }
 
     @Test
@@ -288,6 +271,4 @@ class PedidoTest {
 
         assertEquals(totalExpected, pedido.getValorTotalPedido());
     }
-
-
 }
