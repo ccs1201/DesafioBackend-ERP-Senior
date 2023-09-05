@@ -25,7 +25,7 @@ public class ItemService {
     public Page<Item> findAll(Pageable pageable) {
         var itens = repository.findAll(pageable);
         if (itens.isEmpty()) {
-            throw new RepositoryEntityNotFoundException("Nehum item localizado");
+            throw new RepositoryEntityNotFoundException("Nenhum item localizado");
         }
         return itens;
     }
@@ -71,7 +71,6 @@ public class ItemService {
         return this.save(itemNoBanco);
     }
 
-    @Transactional
     public void ativar(UUID id) {
         var item = this.findById(id);
         item.ativa();

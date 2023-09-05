@@ -97,7 +97,7 @@ public class PedidoService {
      * @return
      */
     @Transactional
-    public Pedido CadastrarNovoPedido(Pedido pedido) {
+    public Pedido cadastrarNovoPedido(Pedido pedido) {
 
         //seta o status do pedido como ABERTO
         pedido.abrir();
@@ -149,7 +149,7 @@ public class PedidoService {
     /**
      * <p>Verifica se há itens inativos no pedido.</p>
      *
-     * @param itensInvalidos Set contente os itens inválidos
+     * @param itensInvalidos Set contendo os itens inválidos
      * @throws PedidoException caso haja algum item inativo
      */
     private static void verificaItensInvalido(Set<Item> itensInvalidos) {
@@ -194,7 +194,7 @@ public class PedidoService {
     /**
      * <p>Remove um {@link ItemPedido} do Pedido
      * e exclui no banco de dados, somente se o Pedido
-     * estiver com satatus ABERTO</p>
+     * estiver com status ABERTO</p>
      *
      * @param idPedido     Id do pedido.
      * @param idItemPedido Id do ItemPedido a ser removido.
@@ -212,7 +212,7 @@ public class PedidoService {
         var pedidos = repository.filtrar(pageable, nome, tipoItem, statusPedido);
 
         if (pedidos.isEmpty()) {
-            throw new RepositoryEntityNotFoundException("Nenum pedido encontro com os parâmetros informados.");
+            throw new RepositoryEntityNotFoundException("Nenhum pedido encontro com os parâmetros informados.");
         }
 
 

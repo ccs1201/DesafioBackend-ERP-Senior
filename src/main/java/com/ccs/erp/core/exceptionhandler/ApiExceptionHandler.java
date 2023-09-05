@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * <p>{@code RestControllerAdvice} Responsável pelo ecaminhamento das
+ * <p>{@code RestControllerAdvice} Responsável pelo encaminhamento das
  * Exceptions da API para o consumidor</p>
  *
  * @author Cleber Souza
@@ -221,7 +221,6 @@ public class ApiExceptionHandler extends BaseExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(@NotNull Exception ex, @Nullable Object body, @NotNull HttpHeaders headers, @NotNull HttpStatus status, @NotNull WebRequest request) {
-
 
         if (body == null) {
             return buildResponseEntity(status, ex, INVALID_FIELD_VALUES);
